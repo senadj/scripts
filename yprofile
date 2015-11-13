@@ -1,0 +1,4 @@
+YBASE=/base
+[ -d "$YBASE" ] && cd $YBASE || { echo "invalid YBASE. Yenv not set. "; return 1; }
+[ -f "$YBASE/scripts/yenv" ] && source $YBASE/scripts/yenv
+export YBASE

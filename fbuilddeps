@@ -1,0 +1,210 @@
+##########################################################################################
+buildboost()
+{
+[ -d "$YBOO" ] && cd $YBOO || { echo -e "\n\n\n\nBoost not build.\n\n\n\n"; return 1; }
+[ -d "$YBOO/stage/lib" ] && [ `find $YBOO/stage/lib/* -prune -name "*.a" ! -name "*.dll.a" | wc -l` -gt 6 ] && return 0
+
+cp $YBASE/scripts/cmdboost.bat $YBOO/.
+
+if ! grep Q_MOC_RUN $YBOO/boost/type_traits/detail/has_binary_operator.hpp > /dev/null; then
+echo "#ifndef Q_MOC_RUN" > tmpf
+cat $YBOO/boost/type_traits/detail/has_binary_operator.hpp >> tmpf
+echo "#endif // Q_MOC_RUN" >> tmpf
+mv tmpf $YBOO/boost/type_traits/detail/has_binary_operator.hpp
+fi
+
+start cmdboost.bat
+
+}
+##########################################################################################
+buildopenssl()
+{
+[ -d "$YOSSL" ] && cd $YOSSL || { echo -e "\n\n\n\nOpenSSL not build.\n\n\n\n"; return 1; }
+[ -d "$YOSSL/build/lib" ] && [ `find $YOSSL/build/lib/* -prune -name "*.a" ! -name "*.dll.a" | wc -l` -gt 1 ] && return 0
+
+perl Configure mingw no-asm no-shared --openssldir=$YOSSL/build
+cat Makefile | sed 's/^PERL=.*$/PERL=perl/' | sed 's/i486/i686\ -Wno-unused-value/' > tmpf
+mv tmpf Makefile
+make build_libs build_apps
+make install_sw
+
+}
+##########################################################################################
+buildberkleydb()
+{
+[ -d "$YBDB" ] && cd $YBDB || { echo -e "\n\n\n\nBerkley DB not build.\n\n\n\n"; return 1; }
+[ `find $YBDB/build_unix/* -prune -name "*.a" ! -name "*.dll.a" | wc -l` -gt 3 ] && return 0
+
+cd $YBDB/build_unix
+../dist/configure CXXFLAGS='-std=gnu++0x' --enable-mingw --enable-cxx --disable-replication --disable-shared
+make
+
+}
+##########################################################################################
+buildminiupnpc()
+{
+[ -d "$YUPNP" ] && cd $YUPNP || { echo -e "\n\n\n\nminiUPnP not build.\n\n\n\n"; return 1; }
+[ -f "`find $YUPNP/* -prune -name "*.a" ! -name "*.dll.a" | head -1`" ] && return 0
+
+cat Makefile.mingw | sed 's/^LDLIBS\ =/LDLIBS\ =\ -static\ -static-libgcc\ -s/' > tmpf
+mv tmpf Makefile.mingw
+make -f Makefile.mingw init upnpc-static
+
+}
+##########################################################################################
+buildzlib()
+{
+[ -d "$YZLIB" ] && cd $YZLIB || { echo -e "\n\n\n\nzlib not build.\n\n\n\n"; return 1; }
+[ -f "`find $YZLIB/* -prune -name "*.a" ! -name "*.dll.a" | head -1`" ] && return 0
+
+make -f win32/Makefile.gcc libz.a
+
+}
+##########################################################################################
+buildlibpng()
+{
+[ -d "$YPNG" ] && [ -d "$YZLIB" ] && cd $YPNG || { echo -e "\n\n\n\nlibpng not build.\n\n\n\n"; return 1; }
+[ -d "$YPNG/.libs" ] && [ -f "`find $YPNG/.libs/* -prune -name "*.a" ! -name "*.dll.a" | head -1`" ] && return 0
+
+./configure CPPFLAGS="-I $YZLIB" LDFLAGS="-L$YZLIB" --disable-shared --enable-static
+cat Makefile | sed 's/\/usr\/bin\///' > tmpf
+mv tmpf Makefile
+make
+
+}
+##########################################################################################
+buildqrencode()
+{
+[ -d "$YQR" ] && [ -d "$YPNG" ] && cd $YQR || { echo -e "\n\n\n\nQRencode not build.\n\n\n\n"; return 1; }
+[ -d "$YQR/.libs" ] && [ -f "`find $YQR/.libs/* -prune -name "*.a" ! -name "*.dll.a" | head -1`" ] && return 0
+
+pnglib=`find $YPNG/.libs/* -prune -name "*.a" ! -name "*.dll.a" | awk -Flib '{print $(NF)}' | cut -d'.' -f1`
+./configure LDFLAGS="-static -static-libgcc -s" png_CFLAGS="-I $YPNG" png_LIBS="-L$YPNG/.libs -l$pnglib" --disable-shared --without-tools
+make
+
+}
+##########################################################################################
+buildqt()
+{
+[ -d "$YQT" ] && cd $YQT || { echo -e "\n\n\n\nQT not build.\n\n\n\n"; return 1; }
+[ `find $YQT/lib/* -prune -name "*.a" ! -name "*.dll.a" | wc -l` -gt 16 ] && return 0
+
+head -1 $YQT/mkspecs/win32-g++-4.6/qmake.conf > tmpf
+echo "QMAKE_CXXFLAGS *= -std=gnu++0x" >> tmpf
+echo "QMAKE_LFLAGS = -static -static-libgcc -static-libstdc++ -s" >> tmpf
+mv tmpf $YQT/mkspecs/win32-g++-4.6/qmake.conf
+
+sed s/-static-libgcc/-static\ -static-libgcc\ -static-libstdc++/ $YQT/qmake/Makefile.win32-g++ > tmpf
+mv tmpf $YQT/qmake/Makefile.win32-g++
+
+sed s/-static-libgcc/-static\ -static-libgcc/ $YQT/qmake/Makefile.win32-g++-sh > tmpf
+mv tmpf $YQT/qmake/Makefile.win32-g++-sh
+
+awk -v addtxt=" && defined(SKIPHACK)" '/defined\(QT_NO_THREAD\)\ \&\&\ defined\(_POSIX_THREAD_SAFE_FUNCTIONS\)/ {$0=$0addtxt} 1' $YQT/src/corelib/tools/qdatetime.cpp > tmpf
+mv tmpf $YQT/src/corelib/tools/qdatetime.cpp
+
+./configure.exe -release -static -opensource -confirm-license -platform win32-g++-4.6 -no-sql-sqlite -no-qt3support -no-opengl -qt-zlib -no-gif -qt-libpng -qt-libmng -no-libtiff -qt-libjpeg -no-dsp -no-vcproj -no-openssl -no-dbus -no-phonon -no-phonon-backend -no-multimedia -no-audio-backend -no-webkit -no-script -no-scripttools -no-declarative -no-declarative-debug -qt-style-windows -qt-style-windowsxp -qt-style-windowsvista -no-style-plastique -no-style-cleanlooks -no-style-motif -no-style-cde -nomake demos -nomake examples
+make
+if [ `echo $PATH | grep qt-everywhere | wc -l` -eq 0 ]; then export PATH=$PATH:$YQT/bin; fi
+
+}
+##########################################################################################
+buildwxwidgets()
+{
+[ -d "$YWX" ] && cd $YWX/build/msw || { echo -e "\n\n\n\nwxWidgets not build. Perhaps you need to extract first.\n\n\n\n"; return 1; }
+[ `find $YWX/lib/gcc_lib/* -prune -name "*.a" ! -name "*.dll.a" | wc -l` -gt 21 ] && return 0
+
+make CXXFLAGS="-std=gnu++0x -march=i686 -Wno-unused-variable -Wno-deprecated-declarations" LDFLAGS="-static -static-libgcc -static-libstdc++ -s" -f makefile.gcc SHARED=0 UNICODE=1 BUILD=release RUNTIME_LIBS=static clean
+make CXXFLAGS="-std=gnu++0x -march=i686 -Wno-unused-variable -Wno-deprecated-declarations" LDFLAGS="-static -static-libgcc -static-libstdc++ -s" -f makefile.gcc SHARED=0 UNICODE=1 BUILD=release RUNTIME_LIBS=static
+if [ `echo $PATH | grep wxWidgets | wc -l` -eq 0 ]; then export PATH=$YWX/bin:$PATH; fi
+
+}
+##########################################################################################
+buildwxfolder()
+{
+[ -d "$YWX" ] && cd $YWX || { echo -e "\n\n\n\nwxfolder not build. Check YWX directory.\n\n\n\n"; return 1; }
+[ -d "$YWX/wxfolder" ] && return 0
+
+git clone https://github.com/senadj/wxfolder
+source wxfolder/fwx-tdm
+make -f wxfolder/Makefile
+
+}
+##########################################################################################
+buildpcre()
+{
+[ -f "$YPCRE/.libs/libpcre.a" ] && return 0
+[ -f "$YDL/pcre-8.38.tar.bz2" ] || ( cd $YDL && curl -L -k https://sourceforge.net/projects/pcre/files/pcre/8.38/pcre-8.38.tar.bz2 > pcre-8.38.tar.bz2 )
+[ -d "$YDEPS/pcre-8.38" ] || 7za e -aoa $YDL/pcre-8.38.tar.bz2 -so | 7za x -aoa -si -ttar -o$YDEPS
+cd $YDEPS/pcre-8.38 && YPCRE=`pwd`
+
+./configure LDFLAGS='-static -static-libgcc -s' --disable-shared --enable-static
+make libpcre.la
+
+if ! grep YPCRE $YBASE/scripts/ydeps > /dev/null; then
+	echo "YPCRE=$YPCRE" >> $YBASE/scripts/ydeps
+	export YPCRE
+fi
+
+}
+##########################################################################################
+buildjansson()
+{
+[ -f "$YJANS/src/.libs/libjansson.a" ] && return 0
+[ -f "$YDL/jansson-2.7.tar.gz" ] || ( cd $YDL && curl -L -k http://www.digip.org/jansson/releases/jansson-2.7.tar.gz > jansson-2.7.tar.gz )
+[ -d "$YDEPS/jansson-2.7" ] || 7za e -aoa $YDL/jansson-2.7.tar.gz -so | 7za x -aoa -si -ttar -o$YDEPS
+cd $YDEPS/jansson-2.7 && YJANS=`pwd`
+
+./configure LDFLAGS='-static -static-libgcc -s' --disable-shared --enable-static
+make
+
+if ! grep YJANS $YBASE/scripts/ydeps > /dev/null; then
+	echo "YJANS=$YJANS" >> $YBASE/scripts/ydeps
+	export YJANS
+fi
+
+}
+##########################################################################################
+buildcurl()
+{
+[ -f "$YCURL/lib/.libs/libcurl.a" ] && return 0
+#[ -d "$YOSSL" ] || { echo -e "\n\n\n\ncURL not build. Check YOSSL directory.\n\n\n\n"; return 1; }
+[ -f "$YDL/curl-7.47.1.tar.bz2" ] || ( cd $YDL && curl -L -k https://curl.haxx.se/download/curl-7.47.1.tar.bz2 > curl-7.47.1.tar.bz2 )
+[ -d "$YDEPS/curl-7.47.1" ] || 7za e -aoa $YDL/curl-7.47.1.tar.bz2 -so | 7za x -aoa -si -ttar -o$YDEPS
+cd $YDEPS/curl-7.47.1 && YCURL=`pwd`
+
+#./configure LDFLAGS='-static -static-libgcc -s' --disable-shared --disable-debug --with-ssl=$YOSSL/build
+./configure LDFLAGS='-static -static-libgcc -s' --disable-shared --disable-debug --without-ssl
+find . -name Makefile | xargs sed -i 's/\/usr\/bin\/mkdir/mkdir/g'
+make
+
+if ! grep YCURL $YBASE/scripts/ydeps > /dev/null; then
+	echo "YCURL=$YCURL" >> $YBASE/scripts/ydeps
+	export YCURL
+fi
+
+}
+##########################################################################################
+buildvanitygen()
+{
+[ -f "$YDEPS/vanitygen/vanitygen.exe" ] && return 0
+[ -d "$YOSSL" ] || { echo -e "\n\n\n\nVanitygen not build. Check YOSSL directory.\n\n\n\n"; return 1; }
+[ -d "$YPCRE" ] || { echo -e "\n\n\n\nVanitygen not build. Check YPCRE directory.\n\n\n\n"; return 1; }
+
+[ -d "$YDEPS/vanitygen" ] || ( cd $YDEPS && git clone https://github.com/samr7/vanitygen )
+cd $YDEPS/vanitygen
+[ -f "$YDEPS/vanitygen/glpi.h" ] || curl -L -k https://raw.githubusercontent.com/mozilla/system-addons/master/python/psutil/psutil/arch/windows/glpi.h > glpi.h
+
+if ! grep glpi.h winglue.c > /dev/null; then
+cat winglue.c | sed 's/winglue.h/winglue.h\"\n#include\ \"glpi.h/' > tmpf
+mv tmpf winglue.c
+fi
+
+gcc -O3 -w -I$YOSSL/build/include -I$YPCRE -D_WIN32 -DPCRE_STATIC -c pattern.c util.c winglue.c vanitygen.c
+gcc -static -static-libgcc -s pattern.o util.o winglue.o vanitygen.o -o vanitygen -L$YOSSL/build/lib -L$YPCRE/.libs -lcrypto -lpcre -lgdi32 -lpthread
+
+}
+
+
+export -f buildzlib buildqt buildqrencode buildopenssl buildminiupnpc buildlibpng buildboost buildberkleydb buildwxwidgets buildwxfolder buildpcre buildjansson buildcurl buildvanitygen
+
