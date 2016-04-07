@@ -63,11 +63,12 @@ do
     boost*) YBOO=$file
 			echo "YBOO=$YBOO"
 			export YBOO
-			YBOOSUFFIX=`find $YBOO/stage/lib -name "libboost_filesystem*.a" | head -1 | awk -Ffilesystem '{print $(NF)}' | cut -d'.' -f1`
+			[ -d "$YBOO/stage/lib" ] && YBOOSUFFIX=`find $YBOO/stage/lib -name "libboost_filesystem*.a" | head -1 | awk -Ffilesystem '{print $(NF)}' | cut -d'.' -f1`
 			echo "YBOOSUFFIX=$YBOOSUFFIX"
 			export YBOOSUFFIX ;;
     openssl*) YOSSL=$file; echo "YOSSL=$YOSSL"; export YOSSL ;;
     db*) YBDB=$file; echo "YBDB=$YBDB"; export YBDB ;;
+	leveldb*) YLDB=$file; echo "YLDB=$YLDB"; export YLDB ;;
     miniupnp*) YUPNP=$file; echo "YUPNP=$YUPNP"; export YUPNP ;;
     zlib*) YZLIB=$file; echo "YZLIB=$YZLIB"; export YZLIB ;;
     libpng*) YPNG=$file; echo "YPNG=$YPNG"; export YPNG ;;
@@ -85,8 +86,8 @@ done
 ############# unset Y env vars #############
 udeps() 
 { 
-unset YBOO; unset YBOOSUFFIX; unset YOSSL;unset YBDB;unset YUPNP;unset YZLIB;unset YPNG;unset YQR;unset YQT; unset YWX; unset YPCRE; unset YJANS; unset YCURL
-echo -e "\nvariables unset:\nYBOO YOSSL YBDB YUPNP YZLIB YPNG YQR YQT YWX YPCRE YJANS YCURL"
+unset YBOO; unset YBOOSUFFIX; unset YOSSL;unset YBDB;unset YUPNP;unset YZLIB;unset YPNG;unset YQR;unset YQT;unset YWX;unset YPCRE;unset YJANS;unset YCURL;unset YLDB;
+echo -e "\nvariables unset:\nYBOO YOSSL YBDB YUPNP YZLIB YPNG YQR YQT YWX YPCRE YJANS YCURL YLDB"
 }
 
 ############# find dependency starting with $1 in YDEPS folder #############
@@ -115,7 +116,7 @@ set | grep "^build"
 echo -e ""
 set | grep "^Y"
 echo -e ""
-cat $YBASE/scripts/makefile | grep "^[A-z]" | awk '{print "ymake "$1}' | sed "s/://g"
+cat $YBASE/scripts/makefile | grep "^[A-z]" | grep -v "SELF_DIR" | awk '{print "ymake "$1}' | sed "s/://g"
 }
 
 ##############################################################################
@@ -130,6 +131,7 @@ PATH=.:$YBASE/gcc/bin:/mingw32/bin:/usr/bin:/bin:`which cmd | awk '{print substr
 [ -d "$YBOO" ] && export YBOO YBOOSUFFIX
 [ -d "$YOSSL" ] && export YOSSL
 [ -d "$YBDB" ] && export YBDB
+[ -d "$YLDB" ] && export YLDB
 [ -d "$YUPNP" ] && export YUPNP
 [ -d "$YZLIB" ] && export YZLIB
 [ -d "$YPNG" ] && export YPNG

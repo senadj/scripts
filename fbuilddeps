@@ -1,10 +1,18 @@
 ##########################################################################################
 buildboost()
 {
-[ -d "$YBOO" ] && cd $YBOO || { echo -e "\n\n\n\nBoost not build.\n\n\n\n"; return 1; }
+[ -f "$YBASE/scripts/ydeps" ] && source $YBASE/scripts/ydeps
 [ -d "$YBOO/stage/lib" ] && [ `find $YBOO/stage/lib/* -prune -name "*.a" ! -name "*.dll.a" | wc -l` -gt 6 ] && return 0
+[ -f "$YDL/boost_1_58_0.7z" ] || ( cd $YDL && curl -L -k http://sourceforge.net/projects/boost/files/boost/1.58.0/boost_1_58_0.7z > boost_1_58_0.7z )
+[ -d "$YDEPS/boost_1_58_0" ] || 7za x -aoa $YDL/boost_1_58_0.7z -o$YDEPS
+cd $YDEPS/boost_1_58_0 && export YBOO=`pwd` || { echo -e "\n\n\n\nBoost not build.\n\n\n\n"; return 1; }
 
-cp $YBASE/scripts/cmdboost.bat $YBOO/.
+if [ "$1" = "zlib" ]; then
+[ -d "$YZLIB" ] || { echo -e "\n\n\n\nBoost not build. Check YZLIB directory.\n\n\n\n"; return 1; }
+cp $YBASE/scripts/cmdboostzlib.bat ./cmdboost.bat
+else
+cp $YBASE/scripts/cmdboost.bat .
+fi
 
 if ! grep Q_MOC_RUN $YBOO/boost/type_traits/detail/has_binary_operator.hpp > /dev/null; then
 echo "#ifndef Q_MOC_RUN" > tmpf
@@ -15,12 +23,18 @@ fi
 
 start cmdboost.bat
 
+if ! grep YBOO $YBASE/scripts/ydeps > /dev/null; then echo "YBOO=$YBOO" >> $YBASE/scripts/ydeps; fi
+
 }
 ##########################################################################################
 buildopenssl()
 {
-[ -d "$YOSSL" ] && cd $YOSSL || { echo -e "\n\n\n\nOpenSSL not build.\n\n\n\n"; return 1; }
+[ -f "$YBASE/scripts/ydeps" ] && source $YBASE/scripts/ydeps
 [ -d "$YOSSL/build/lib" ] && [ `find $YOSSL/build/lib/* -prune -name "*.a" ! -name "*.dll.a" | wc -l` -gt 1 ] && return 0
+[ -f "$YDL/openssl-1.0.1s.tar.gz" ] || ( cd $YDL && curl -L -k https://www.openssl.org/source/openssl-1.0.1s.tar.gz > openssl-1.0.1s.tar.gz )
+[ -d "$YDEPS/openssl-1.0.1s" ] || 7za e -aoa $YDL/openssl-1.0.1s.tar.gz -so | 7za x -aoa -si -ttar -o$YDEPS
+cd $YDEPS/openssl-1.0.1s && export YOSSL=`pwd` || { echo -e "\n\n\n\nOpenSSL not build.\n\n\n\n"; return 1; }
+
 
 perl Configure mingw no-asm no-shared --openssldir=$YOSSL/build
 cat Makefile | sed 's/^PERL=.*$/PERL=perl/' | sed 's/i486/i686\ -Wno-unused-value/' > tmpf
@@ -28,66 +42,101 @@ mv tmpf Makefile
 make build_libs build_apps
 make install_sw
 
+if ! grep YOSSL $YBASE/scripts/ydeps > /dev/null; then echo "YOSSL=$YOSSL" >> $YBASE/scripts/ydeps; fi
+
 }
 ##########################################################################################
 buildberkleydb()
 {
-[ -d "$YBDB" ] && cd $YBDB || { echo -e "\n\n\n\nBerkley DB not build.\n\n\n\n"; return 1; }
-[ `find $YBDB/build_unix/* -prune -name "*.a" ! -name "*.dll.a" | wc -l` -gt 3 ] && return 0
+[ -f "$YBASE/scripts/ydeps" ] && source $YBASE/scripts/ydeps
+[ -d "$YBDB/build_unix" ] && [ `find $YBDB/build_unix/* -prune -name "*.a" ! -name "*.dll.a" | wc -l` -gt 3 ] && return 0
+[ -f "$YDL/db-4.8.30.NC.tar.gz" ] || ( cd $YDL && curl -L -k http://download.oracle.com/berkeley-db/db-4.8.30.NC.tar.gz > db-4.8.30.NC.tar.gz )
+[ -d "$YDEPS/db-4.8.30.NC" ] || 7za e -aoa $YDL/db-4.8.30.NC.tar.gz -so | 7za x -aoa -si -ttar -o$YDEPS
+cd $YDEPS/db-4.8.30.NC && export YBDB=`pwd` || { echo -e "\n\n\n\nBerkley DB not build.\n\n\n\n"; return 1; }
+
 
 cd $YBDB/build_unix
 ../dist/configure CXXFLAGS='-std=gnu++0x' --enable-mingw --enable-cxx --disable-replication --disable-shared
 make
 
+if ! grep YBDB $YBASE/scripts/ydeps > /dev/null; then echo "YBDB=$YBDB" >> $YBASE/scripts/ydeps; fi
+
 }
 ##########################################################################################
 buildminiupnpc()
 {
-[ -d "$YUPNP" ] && cd $YUPNP || { echo -e "\n\n\n\nminiUPnP not build.\n\n\n\n"; return 1; }
-[ -f "`find $YUPNP/* -prune -name "*.a" ! -name "*.dll.a" | head -1`" ] && return 0
+[ -f "$YBASE/scripts/ydeps" ] && source $YBASE/scripts/ydeps
+[ -d "$YUPNP" ] && [ -f "`find $YUPNP/* -prune -name "*.a" ! -name "*.dll.a" | head -1`" ] && return 0
+[ -f "$YDL/miniupnpc-1.9.20150206.tar.gz" ] || ( cd $YDL && curl -L -k http://miniupnp.free.fr/files/download.php?file=miniupnpc-1.9.20150206.tar.gz > miniupnpc-1.9.20150206.tar.gz )
+[ -d "$YDEPS/miniupnpc-1.9.20150206" ] || 7za e -aoa $YDL/miniupnpc-1.9.20150206.tar.gz -so | 7za x -aoa -si -ttar -o$YDEPS
+cd $YDEPS/miniupnpc-1.9.20150206 && export YUPNP=`pwd` || { echo -e "\n\n\n\nminiUPnP not build.\n\n\n\n"; return 1; }
+
 
 cat Makefile.mingw | sed 's/^LDLIBS\ =/LDLIBS\ =\ -static\ -static-libgcc\ -s/' > tmpf
 mv tmpf Makefile.mingw
 make -f Makefile.mingw init upnpc-static
 
+if ! grep YUPNP $YBASE/scripts/ydeps > /dev/null; then echo "YUPNP=$YUPNP" >> $YBASE/scripts/ydeps; fi
+
 }
 ##########################################################################################
 buildzlib()
 {
-[ -d "$YZLIB" ] && cd $YZLIB || { echo -e "\n\n\n\nzlib not build.\n\n\n\n"; return 1; }
-[ -f "`find $YZLIB/* -prune -name "*.a" ! -name "*.dll.a" | head -1`" ] && return 0
+[ -f "$YBASE/scripts/ydeps" ] && source $YBASE/scripts/ydeps
+[ -d "$YZLIB" ] && [ -f "`find $YZLIB/* -prune -name "*.a" ! -name "*.dll.a" | head -1`" ] && return 0
+[ -f "$YDL/zlib-1.2.8.tar.gz" ] || ( cd $YDL && curl -L -k http://sourceforge.net/projects/libpng/files/zlib/1.2.8/zlib-1.2.8.tar.gz > zlib-1.2.8.tar.gz )
+[ -d "$YDEPS/zlib-1.2.8" ] || 7za e -aoa $YDL/zlib-1.2.8.tar.gz -so | 7za x -aoa -si -ttar -o$YDEPS
+cd $YDEPS/zlib-1.2.8 && export YZLIB=`pwd` || { echo -e "\n\n\n\nzlib not build.\n\n\n\n"; return 1; }
 
 make -f win32/Makefile.gcc libz.a
+
+if ! grep YZLIB $YBASE/scripts/ydeps > /dev/null; then echo "YZLIB=$YZLIB" >> $YBASE/scripts/ydeps; fi
 
 }
 ##########################################################################################
 buildlibpng()
 {
-[ -d "$YPNG" ] && [ -d "$YZLIB" ] && cd $YPNG || { echo -e "\n\n\n\nlibpng not build.\n\n\n\n"; return 1; }
+[ -f "$YBASE/scripts/ydeps" ] && source $YBASE/scripts/ydeps
 [ -d "$YPNG/.libs" ] && [ -f "`find $YPNG/.libs/* -prune -name "*.a" ! -name "*.dll.a" | head -1`" ] && return 0
+[ -f "$YDL/libpng-1.6.20.tar.gz" ] || ( cd $YDL && curl -L -k http://sourceforge.net/projects/libpng/files/libpng16/1.6.20/libpng-1.6.20.tar.gz > libpng-1.6.20.tar.gz )
+[ -d "$YDEPS/libpng-1.6.20" ] || 7za e -aoa $YDL/libpng-1.6.20.tar.gz -so | 7za x -aoa -si -ttar -o$YDEPS
+[ -d "$YZLIB" ] && cd $YDEPS/libpng-1.6.20 && export YPNG=`pwd` || { echo -e "\n\n\n\nlibpng not build.\n\n\n\n"; return 1; }
+
 
 ./configure CPPFLAGS="-I $YZLIB" LDFLAGS="-L$YZLIB" --disable-shared --enable-static
 cat Makefile | sed 's/\/usr\/bin\///' > tmpf
 mv tmpf Makefile
 make
 
+if ! grep YPNG $YBASE/scripts/ydeps > /dev/null; then echo "YPNG=$YPNG" >> $YBASE/scripts/ydeps; fi
+
 }
 ##########################################################################################
 buildqrencode()
 {
-[ -d "$YQR" ] && [ -d "$YPNG" ] && cd $YQR || { echo -e "\n\n\n\nQRencode not build.\n\n\n\n"; return 1; }
+[ -f "$YBASE/scripts/ydeps" ] && source $YBASE/scripts/ydeps
 [ -d "$YQR/.libs" ] && [ -f "`find $YQR/.libs/* -prune -name "*.a" ! -name "*.dll.a" | head -1`" ] && return 0
+[ -f "$YDL/qrencode-3.4.4.tar.gz" ] || ( cd $YDL && curl -L -k https://fukuchi.org/works/qrencode/qrencode-3.4.4.tar.gz > qrencode-3.4.4.tar.gz )
+[ -d "$YDEPS/qrencode-3.4.4" ] || 7za e -aoa $YDL/qrencode-3.4.4.tar.gz -so | 7za x -aoa -si -ttar -o$YDEPS
+[ -d "$YPNG" ] && cd $YDEPS/qrencode-3.4.4 && export YQR=`pwd` || { echo -e "\n\n\n\nQRencode not build.\n\n\n\n"; return 1; }
+
 
 pnglib=`find $YPNG/.libs/* -prune -name "*.a" ! -name "*.dll.a" | awk -Flib '{print $(NF)}' | cut -d'.' -f1`
 ./configure LDFLAGS="-static -static-libgcc -s" png_CFLAGS="-I $YPNG" png_LIBS="-L$YPNG/.libs -l$pnglib" --disable-shared --without-tools
 make
 
+if ! grep YQR $YBASE/scripts/ydeps > /dev/null; then echo "YQR=$YQR" >> $YBASE/scripts/ydeps; fi
+
 }
 ##########################################################################################
 buildqt()
 {
-[ -d "$YQT" ] && cd $YQT || { echo -e "\n\n\n\nQT not build.\n\n\n\n"; return 1; }
-[ `find $YQT/lib/* -prune -name "*.a" ! -name "*.dll.a" | wc -l` -gt 16 ] && return 0
+[ -f "$YBASE/scripts/ydeps" ] && source $YBASE/scripts/ydeps
+[ -d "$YQT/lib" ] && [ `find $YQT/lib/* -prune -name "*.a" ! -name "*.dll.a" | wc -l` -gt 16 ] && return 0
+[ -f "$YDL/qt-everywhere-opensource-src-4.8.6.tar.gz" ] || ( cd $YDL && curl -L -k http://download.qt.io/archive/qt/4.8/4.8.6/qt-everywhere-opensource-src-4.8.6.tar.gz > qt-everywhere-opensource-src-4.8.6.tar.gz )
+[ -d "$YDEPS/qt-everywhere-opensource-src-4.8.6" ] || 7za e -aoa $YDL/qt-everywhere-opensource-src-4.8.6.tar.gz -so | 7za x -aoa -si -ttar -o$YDEPS
+cd $YDEPS/qt-everywhere-opensource-src-4.8.6 && export YQT=`pwd` || { echo -e "\n\n\n\nQT not build.\n\n\n\n"; return 1; }
+
 
 head -1 $YQT/mkspecs/win32-g++-4.6/qmake.conf > tmpf
 echo "QMAKE_CXXFLAGS *= -std=gnu++0x" >> tmpf
@@ -105,23 +154,31 @@ mv tmpf $YQT/src/corelib/tools/qdatetime.cpp
 
 ./configure.exe -release -static -opensource -confirm-license -platform win32-g++-4.6 -no-sql-sqlite -no-qt3support -no-opengl -qt-zlib -no-gif -qt-libpng -qt-libmng -no-libtiff -qt-libjpeg -no-dsp -no-vcproj -no-openssl -no-dbus -no-phonon -no-phonon-backend -no-multimedia -no-audio-backend -no-webkit -no-script -no-scripttools -no-declarative -no-declarative-debug -qt-style-windows -qt-style-windowsxp -qt-style-windowsvista -no-style-plastique -no-style-cleanlooks -no-style-motif -no-style-cde -nomake demos -nomake examples
 make
+
+if ! grep YQT $YBASE/scripts/ydeps > /dev/null; then echo "YQT=$YQT" >> $YBASE/scripts/ydeps; fi
 if [ `echo $PATH | grep qt-everywhere | wc -l` -eq 0 ]; then export PATH=$PATH:$YQT/bin; fi
 
 }
 ##########################################################################################
 buildwxwidgets()
 {
-[ -d "$YWX" ] && cd $YWX/build/msw || { echo -e "\n\n\n\nwxWidgets not build. Perhaps you need to extract first.\n\n\n\n"; return 1; }
-[ `find $YWX/lib/gcc_lib/* -prune -name "*.a" ! -name "*.dll.a" | wc -l` -gt 21 ] && return 0
+[ -f "$YBASE/scripts/ydeps" ] && source $YBASE/scripts/ydeps
+[ -d "$YWX/lib/gcc_lib" ] && [ `find $YWX/lib/gcc_lib/* -prune -name "*.a" ! -name "*.dll.a" | wc -l` -gt 21 ] && return 0
+[ -f "$YDL/wxWidgets-3.1.0.tar.bz2" ] || ( cd $YDL && curl -L -k https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.0/wxWidgets-3.1.0.tar.bz2 > wxWidgets-3.1.0.tar.bz2 )
+[ -d "$YDEPS/wxWidgets-3.1.0" ] || 7za e -aoa $YDL/wxWidgets-3.1.0.tar.bz2 -so | 7za x -aoa -si -ttar -o$YDEPS
+cd $YDEPS/wxWidgets-3.1.0 && export YWX=`pwd` && cd build/msw || { echo -e "\n\n\n\nwxWidgets not build.\n\n\n\n"; return 1; }
 
 make CXXFLAGS="-std=gnu++0x -march=i686 -Wno-unused-variable -Wno-deprecated-declarations" LDFLAGS="-static -static-libgcc -static-libstdc++ -s" -f makefile.gcc SHARED=0 UNICODE=1 BUILD=release RUNTIME_LIBS=static clean
 make CXXFLAGS="-std=gnu++0x -march=i686 -Wno-unused-variable -Wno-deprecated-declarations" LDFLAGS="-static -static-libgcc -static-libstdc++ -s" -f makefile.gcc SHARED=0 UNICODE=1 BUILD=release RUNTIME_LIBS=static
+
+if ! grep YWX $YBASE/scripts/ydeps > /dev/null; then echo "YWX=$YWX" >> $YBASE/scripts/ydeps; fi
 if [ `echo $PATH | grep wxWidgets | wc -l` -eq 0 ]; then export PATH=$YWX/bin:$PATH; fi
 
 }
 ##########################################################################################
 buildwxfolder()
 {
+[ -f "$YBASE/scripts/ydeps" ] && source $YBASE/scripts/ydeps
 [ -d "$YWX" ] && cd $YWX || { echo -e "\n\n\n\nwxfolder not build. Check YWX directory.\n\n\n\n"; return 1; }
 [ -d "$YWX/wxfolder" ] && return 0
 
@@ -133,67 +190,81 @@ make -f wxfolder/Makefile
 ##########################################################################################
 buildpcre()
 {
+[ -f "$YBASE/scripts/ydeps" ] && source $YBASE/scripts/ydeps
 [ -f "$YPCRE/.libs/libpcre.a" ] && return 0
 [ -f "$YDL/pcre-8.38.tar.bz2" ] || ( cd $YDL && curl -L -k https://sourceforge.net/projects/pcre/files/pcre/8.38/pcre-8.38.tar.bz2 > pcre-8.38.tar.bz2 )
 [ -d "$YDEPS/pcre-8.38" ] || 7za e -aoa $YDL/pcre-8.38.tar.bz2 -so | 7za x -aoa -si -ttar -o$YDEPS
-cd $YDEPS/pcre-8.38 && YPCRE=`pwd`
+cd $YDEPS/pcre-8.38 && export YPCRE=`pwd` || { echo -e "\n\n\n\nPCRE not build.\n\n\n\n"; return 1; }
 
 ./configure LDFLAGS='-static -static-libgcc -s' --disable-shared --enable-static
 make libpcre.la
 
-if ! grep YPCRE $YBASE/scripts/ydeps > /dev/null; then
-	echo "YPCRE=$YPCRE" >> $YBASE/scripts/ydeps
-	export YPCRE
-fi
+if ! grep YPCRE $YBASE/scripts/ydeps > /dev/null; then echo "YPCRE=$YPCRE" >> $YBASE/scripts/ydeps; fi
 
 }
 ##########################################################################################
 buildjansson()
 {
+[ -f "$YBASE/scripts/ydeps" ] && source $YBASE/scripts/ydeps
 [ -f "$YJANS/src/.libs/libjansson.a" ] && return 0
 [ -f "$YDL/jansson-2.7.tar.gz" ] || ( cd $YDL && curl -L -k http://www.digip.org/jansson/releases/jansson-2.7.tar.gz > jansson-2.7.tar.gz )
 [ -d "$YDEPS/jansson-2.7" ] || 7za e -aoa $YDL/jansson-2.7.tar.gz -so | 7za x -aoa -si -ttar -o$YDEPS
-cd $YDEPS/jansson-2.7 && YJANS=`pwd`
+cd $YDEPS/jansson-2.7 && export YJANS=`pwd` || { echo -e "\n\n\n\nJansson not build.\n\n\n\n"; return 1; }
 
 ./configure LDFLAGS='-static -static-libgcc -s' --disable-shared --enable-static
 make
 
-if ! grep YJANS $YBASE/scripts/ydeps > /dev/null; then
-	echo "YJANS=$YJANS" >> $YBASE/scripts/ydeps
-	export YJANS
-fi
+if ! grep YJANS $YBASE/scripts/ydeps > /dev/null; then echo "YJANS=$YJANS" >> $YBASE/scripts/ydeps; fi
 
 }
 ##########################################################################################
 buildcurl()
 {
+[ -f "$YBASE/scripts/ydeps" ] && source $YBASE/scripts/ydeps
 [ -f "$YCURL/lib/.libs/libcurl.a" ] && return 0
-#[ -d "$YOSSL" ] || { echo -e "\n\n\n\ncURL not build. Check YOSSL directory.\n\n\n\n"; return 1; }
 [ -f "$YDL/curl-7.47.1.tar.bz2" ] || ( cd $YDL && curl -L -k https://curl.haxx.se/download/curl-7.47.1.tar.bz2 > curl-7.47.1.tar.bz2 )
 [ -d "$YDEPS/curl-7.47.1" ] || 7za e -aoa $YDL/curl-7.47.1.tar.bz2 -so | 7za x -aoa -si -ttar -o$YDEPS
-cd $YDEPS/curl-7.47.1 && YCURL=`pwd`
+cd $YDEPS/curl-7.47.1 && export YCURL=`pwd` || { echo -e "\n\n\n\ncURL not build.\n\n\n\n"; return 1; }
 
-#./configure LDFLAGS='-static -static-libgcc -s' --disable-shared --disable-debug --with-ssl=$YOSSL/build
+if [ "$1" = "openssl" ]; then
+[ -d "$YOSSL" ] || { echo -e "\n\n\n\ncURL not build. Check YOSSL directory.\n\n\n\n"; return 1; }
+./configure LDFLAGS='-static -static-libgcc -s' --disable-shared --disable-debug --with-ssl=$YOSSL/build
+else
 ./configure LDFLAGS='-static -static-libgcc -s' --disable-shared --disable-debug --without-ssl
+fi
+
 find . -name Makefile | xargs sed -i 's/\/usr\/bin\/mkdir/mkdir/g'
 make
 
-if ! grep YCURL $YBASE/scripts/ydeps > /dev/null; then
-	echo "YCURL=$YCURL" >> $YBASE/scripts/ydeps
-	export YCURL
-fi
+if ! grep YCURL $YBASE/scripts/ydeps > /dev/null; then echo "YCURL=$YCURL" >> $YBASE/scripts/ydeps; fi
+
+}
+##########################################################################################
+buildleveldb()
+{
+[ -f "$YBASE/scripts/ydeps" ] && source $YBASE/scripts/ydeps
+[ -f "$YLDB/libleveldb.a" ] && return 0
+[ -f "$YDL/leveldb-mingw-master.zip" ] || ( cd $YDL && curl -L -k https://github.com/zalanyib/leveldb-mingw/archive/master.zip > leveldb-mingw-master.zip )
+[ -d "$YDEPS/leveldb-mingw-master" ] || unzip -d $YDEPS $YDL/leveldb-mingw-master.zip
+cd $YDEPS/leveldb-mingw-master && export YLDB=`pwd` || { echo -e "\n\n\n\nLevelDB not build.\n\n\n\n"; return 1; }
+
+make libmemenv.a libleveldb.a
+
+if ! grep YLDB $YBASE/scripts/ydeps > /dev/null; then echo "YLDB=$YLDB" >> $YBASE/scripts/ydeps; fi
 
 }
 ##########################################################################################
 buildvanitygen()
 {
+[ -f "$YBASE/scripts/ydeps" ] && source $YBASE/scripts/ydeps
 [ -f "$YDEPS/vanitygen/vanitygen.exe" ] && return 0
 [ -d "$YOSSL" ] || { echo -e "\n\n\n\nVanitygen not build. Check YOSSL directory.\n\n\n\n"; return 1; }
 [ -d "$YPCRE" ] || { echo -e "\n\n\n\nVanitygen not build. Check YPCRE directory.\n\n\n\n"; return 1; }
 
-[ -d "$YDEPS/vanitygen" ] || ( cd $YDEPS && git clone https://github.com/samr7/vanitygen )
-cd $YDEPS/vanitygen
-[ -f "$YDEPS/vanitygen/glpi.h" ] || curl -L -k https://raw.githubusercontent.com/mozilla/system-addons/master/python/psutil/psutil/arch/windows/glpi.h > glpi.h
+[ -f "$YDL/vanitygen-master.zip" ] || ( cd $YDL && curl -L -k https://github.com/samr7/vanitygen/archive/master.zip > vanitygen-master.zip )
+[ -d "$YDEPS/vanitygen-master" ] || unzip -d $YDEPS $YDL/vanitygen-master.zip
+cd $YDEPS/vanitygen-master || { echo -e "\n\n\n\nvanitygen not build.\n\n\n\n"; return 1; }
+[ -f "$YDEPS/vanitygen-master/glpi.h" ] || curl -L -k https://raw.githubusercontent.com/mozilla/system-addons/master/python/psutil/psutil/arch/windows/glpi.h > glpi.h
 
 if ! grep glpi.h winglue.c > /dev/null; then
 cat winglue.c | sed 's/winglue.h/winglue.h\"\n#include\ \"glpi.h/' > tmpf
@@ -206,5 +277,5 @@ gcc -static -static-libgcc -s pattern.o util.o winglue.o vanitygen.o -o vanityge
 }
 
 
-export -f buildzlib buildqt buildqrencode buildopenssl buildminiupnpc buildlibpng buildboost buildberkleydb buildwxwidgets buildwxfolder buildpcre buildjansson buildcurl buildvanitygen
+export -f buildzlib buildqt buildqrencode buildopenssl buildminiupnpc buildlibpng buildboost buildberkleydb buildwxwidgets buildwxfolder buildpcre buildjansson buildcurl buildleveldb buildvanitygen
 

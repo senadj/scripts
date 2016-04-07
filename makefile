@@ -1,5 +1,9 @@
 SELF_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 
+
+info:
+	bash -i -c yinfo
+	
 all: checkenv boost openssl berkleydb miniupnpc qrencode qt
 
 checkenv:
@@ -15,7 +19,7 @@ berkleydb:
 	@echo "";  echo "############################## Berkley DB"
 	bash -i -c buildberkleydb	
 miniupnpc:
-	@echo "";  echo "############################## MiniUPnP"
+	@echo "";  echo "############################## MiniUPnP Client"
 	bash -i -c buildminiupnpc
 qt: qrencode
 	@echo "";  echo "############################## QT"
@@ -29,14 +33,28 @@ libpng: zlib
 zlib:
 	@echo "";  echo "############################## Zlib"
 	bash -i -c buildzlib
+pcre:
+	@echo "";  echo "############################## PCRE"
+	bash -i -c buildpcre
+jansson:
+	@echo "";  echo "############################## Jansson"
+	bash -i -c buildjansson
+curl: openssl
+	@echo "";  echo "############################## cURL"
+	bash -i -c buildcurl
+leveldb:
+	@echo "";  echo "############################## LevelDB"
+	bash -i -c buildleveldb
+vanitygen: openssl pcre
+	@echo "";  echo "############################## Vanitygen"
+	bash -i -c buildvanitygen
 wxwidgets:
 	@echo "";  echo "############################## wxWidgets"
 	bash -i -c buildwxwidgets
 wxfolder:
 	@echo "";  echo "############################## wxfolder"
 	bash -i -c buildwxfolder
-info:
-	bash -i -c yinfo
+
 
 .PHONY: info init
 
