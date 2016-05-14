@@ -222,9 +222,9 @@ buildcurl()
 {
 [ -f "$YBASE/scripts/ydeps" ] && source $YBASE/scripts/ydeps
 [ -f "$YCURL/lib/.libs/libcurl.a" ] && return 0
-[ -f "$YDL/curl-7.47.1.tar.bz2" ] || ( cd $YDL && curl -L -k https://curl.haxx.se/download/curl-7.47.1.tar.bz2 > curl-7.47.1.tar.bz2 )
-[ -d "$YDEPS/curl-7.47.1" ] || 7za e -aoa $YDL/curl-7.47.1.tar.bz2 -so | 7za x -aoa -si -ttar -o$YDEPS
-cd $YDEPS/curl-7.47.1 && export YCURL=`pwd` || { echo -e "\n\n\n\ncURL not build.\n\n\n\n"; return 1; }
+[ -f "$YDL/curl-7.48.0.tar.bz2" ] || ( cd $YDL && curl -L -k https://curl.haxx.se/download/curl-7.48.0.tar.bz2 > curl-7.48.0.tar.bz2 )
+[ -d "$YDEPS/curl-7.48.0" ] || 7za e -aoa $YDL/curl-7.48.0.tar.bz2 -so | 7za x -aoa -si -ttar -o$YDEPS
+cd $YDEPS/curl-7.48.0 && export YCURL=`pwd` || { echo -e "\n\n\n\ncURL not build.\n\n\n\n"; return 1; }
 
 if [ "$1" = "openssl" ]; then
 [ -d "$YOSSL" ] || { echo -e "\n\n\n\ncURL not build. Check YOSSL directory.\n\n\n\n"; return 1; }
