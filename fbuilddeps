@@ -261,15 +261,9 @@ buildvanitygen()
 [ -d "$YOSSL" ] || { echo -e "\n\n\n\nVanitygen not build. Check YOSSL directory.\n\n\n\n"; return 1; }
 [ -d "$YPCRE" ] || { echo -e "\n\n\n\nVanitygen not build. Check YPCRE directory.\n\n\n\n"; return 1; }
 
-[ -f "$YDL/vanitygen-master.zip" ] || ( cd $YDL && curl -L -k https://github.com/samr7/vanitygen/archive/master.zip > vanitygen-master.zip )
+[ -f "$YDL/vanitygen-master.zip" ] || ( cd $YDL && curl -L -k https://github.com/senadj/vanitygen/archive/master.zip > vanitygen-master.zip )
 [ -d "$YDEPS/vanitygen-master" ] || unzip -d $YDEPS $YDL/vanitygen-master.zip
 cd $YDEPS/vanitygen-master || { echo -e "\n\n\n\nvanitygen not build.\n\n\n\n"; return 1; }
-[ -f "$YDEPS/vanitygen-master/glpi.h" ] || curl -L -k https://raw.githubusercontent.com/mozilla/system-addons/master/python/psutil/psutil/arch/windows/glpi.h > glpi.h
-
-if ! grep glpi.h winglue.c > /dev/null; then
-cat winglue.c | sed 's/winglue.h/winglue.h\"\n#include\ \"glpi.h/' > tmpf
-mv tmpf winglue.c
-fi
 
 gcc -O3 -w -I$YOSSL/build/include -I$YPCRE -D_WIN32 -DPCRE_STATIC -c pattern.c util.c winglue.c vanitygen.c
 gcc -static -static-libgcc -s pattern.o util.o winglue.o vanitygen.o -o vanitygen -L$YOSSL/build/lib -L$YPCRE/.libs -lcrypto -lpcre -lgdi32 -lpthread
