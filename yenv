@@ -12,15 +12,6 @@ YDEPS="$YBASE/deps"
 [ -d "$YBASE/gcc" ] || mkdir -p $YBASE/gcc
 [ -d "$YBASE/codeblocks" ] || mkdir -p $YBASE/codeblocks
 
-##############################   init    #####################################
-yinit()
-{
-if [ `find $YDL -prune -type f | wc -l` -eq 0 ]; then source $YBASE/scripts/download; fi
-if [ `find $YBASE/gcc -prune -type f | wc -l` -eq 0 ]; then source $YBASE/scripts/instgcc; fi
-if [ `find $YBASE/codeblocks -prune -type f | wc -l` -eq 0 ]; then source $YBASE/scripts/instcdb; fi
-if [ `ls -1 $YDEPS | wc -l` -eq 0 ]; then source $YBASE/scripts/instdeps; fi
-}
-
 ############# eXtract dependencies in YDL folder to YDEPS folder #############
 xdeps () 
 {
@@ -141,5 +132,5 @@ PATH=.:$YBASE/gcc/bin:/mingw32/bin:/usr/bin:/bin:`which cmd | awk '{print substr
 [ -d "$YCURL" ] && export YCURL
 
 export PATH YDEPS YDL
-export -f yboostsuffix yinfo yinit
+export -f yboostsuffix yinfo
 

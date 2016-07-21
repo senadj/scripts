@@ -1,8 +1,11 @@
 cdbbase=$YBASE/codeblocks
-
 ################## CodeBlocks IDE ##################
+
+if [ ! -f "$cdbbase/codeblocks.exe" ]; then
+
 mkdir -p $cdbbase/projects
 mkdir -p $cdbbase/AppData/codeblocks
+
 YTMP=`cygpath -m $YBASE | sed 's/\//\\\\\\\\/g'`
 cat $YBASE/scripts/default.conf | sed "s/YREPLACEBASE/$YTMP/g" > $cdbbase/AppData/codeblocks/default.conf
 
@@ -11,5 +14,4 @@ xcdb CB_20151115_rev10574_win32.7z
 xcdb wxmsw28u_gcc_cb_wx2812_gcc492-TDM.7z
 xcdb mingwm10_gcc492-TDM.7z
 
-
-
+fi

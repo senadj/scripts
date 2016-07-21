@@ -1,6 +1,8 @@
 gccbase=$YBASE/gcc
-
 ################## GNU C++ ##################
+
+if [ ! -f "$gccbase/bin/g++.exe" ]; then
+
 mkdir -p $gccbase
 function xgcc ()
 { 	
@@ -24,3 +26,5 @@ xgcc mingwrt-3.20-2-mingw32-dev.tar.lzma
 xgcc make-3.82.90-2-mingw32-cvs-20120902-bin.tar.lzma
 
 cp $gccbase/bin/mingw32-make.exe $gccbase/bin/make.exe
+
+fi

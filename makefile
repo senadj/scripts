@@ -56,6 +56,6 @@ wxfolder:
 	bash -i -c buildwxfolder
 
 
-.PHONY: info init
+.PHONY: info
 
 
