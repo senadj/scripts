@@ -9,7 +9,7 @@ cd $YDEPS/boost_1_58_0 && export YBOO=`pwd` || { echo -e "\n\n\n\nBoost not buil
 
 if [ "$1" = "zlib" ]; then
 [ -d "$YZLIB" ] || { echo -e "\n\n\n\nBoost not build. Check YZLIB directory.\n\n\n\n"; return 1; }
-cp $YBASE/scripts/cmdboostzlib.bat ./cmdboost.bat
+sed 's/date_time/date_time\ --with-serialization\ --with-iostreams\ -s\ ZLIB_SOURCE="%YZLIB%"/' $YBASE/scripts/cmdboost.bat > ./cmdboost.bat
 else
 cp $YBASE/scripts/cmdboost.bat .
 fi
