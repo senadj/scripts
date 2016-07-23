@@ -111,7 +111,12 @@ cat $YBASE/scripts/makefile | grep "^[A-z]" | grep -v "SELF_DIR" | awk '{print "
 }
 
 ##############################################################################
-[ -f "$YBASE/scripts/ydeps" ] && source $YBASE/scripts/ydeps
+if [ -f "$YBASE/scripts/ydeps" ]; then
+source $YBASE/scripts/ydeps
+else
+touch $YBASE/scripts/ydeps
+fi
+
 [ -f "$YBASE/scripts/fbuilddeps" ] && source $YBASE/scripts/fbuilddeps
 
 PATH=.:$YBASE/gcc/bin:/mingw32/bin:/usr/bin:/bin:`which cmd | awk '{print substr($0, 1, length($0)-4)}'`
