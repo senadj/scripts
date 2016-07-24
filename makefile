@@ -4,7 +4,7 @@ SELF_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 info:
 	bash -i -c yinfo
 	
-all: checkenv boost openssl berkleydb miniupnpc qrencode qt
+all: checkenv boost openssl berkeleydb miniupnpc qrencode qt
 
 checkenv:
 	@[ ! -z `type -t buildboost` ] || ( echo -e "\n\nfbuilddeps environment is not set!  Try this first:\nsource $(SELF_DIR)fbuilddeps\n\n" )
@@ -15,9 +15,9 @@ boost:
 openssl:
 	@echo "";  echo "############################## OpenSSL"
 	bash -i -c buildopenssl
-berkleydb:
-	@echo "";  echo "############################## Berkley DB"
-	bash -i -c buildberkleydb	
+berkeleydb:
+	@echo "";  echo "############################## Berkeley DB"
+	bash -i -c buildberkeleydb	
 miniupnpc:
 	@echo "";  echo "############################## MiniUPnP Client"
 	bash -i -c buildminiupnpc

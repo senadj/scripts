@@ -46,7 +46,7 @@ if ! grep YOSSL $YBASE/scripts/ydeps > /dev/null; then echo "YOSSL=$YOSSL" >> $Y
 
 }
 ##########################################################################################
-buildberkleydb()
+buildberkeleydb()
 {
 [ -f "$YBASE/scripts/ydeps" ] && source $YBASE/scripts/ydeps
 [ -d "$YBDB/build_unix" ] && [ `find $YBDB/build_unix/* -prune -name "*.a" ! -name "*.dll.a" | wc -l` -gt 3 ] && return 0
@@ -300,5 +300,5 @@ gcc -static -static-libgcc -s pattern.o util.o winglue.o vanitygen.o -o vanityge
 }
 
 
-export -f buildzlib buildqt buildqrencode buildopenssl buildminiupnpc buildlibpng buildboost buildberkleydb buildwxwidgets buildwxfolder buildpcre buildjansson buildcurl buildleveldb buildvanitygen
+export -f buildzlib buildqt buildqrencode buildopenssl buildminiupnpc buildlibpng buildboost buildberkeleydb buildwxwidgets buildwxfolder buildpcre buildjansson buildcurl buildleveldb buildvanitygen
 
