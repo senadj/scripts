@@ -273,11 +273,11 @@ buildleveldb()
 {
 [ -f "$YBASE/scripts/ydeps" ] && source $YBASE/scripts/ydeps
 [ -f "$YLDB/libleveldb.a" ] && return 0
-[ -f "$YDL/leveldb-mingw-master.zip" ] || ( cd $YDL && curl -L -k https://github.com/zalanyib/leveldb-mingw/archive/master.zip > leveldb-mingw-master.zip )
-[ -d "$YDEPS/leveldb-mingw-master" ] || unzip -d $YDEPS $YDL/leveldb-mingw-master.zip
-cd $YDEPS/leveldb-mingw-master && export YLDB=`pwd` || { echo -e "\n\n\n\nLevelDB not build.\n\n\n\n"; return 1; }
+[ -f "$YDL/leveldb-bitcoin-fork.zip" ] || ( cd $YDL && curl -L -k https://github.com/bitcoin-core/leveldb/archive/bitcoin-fork.zip > leveldb-bitcoin-fork.zip )
+[ -d "$YDEPS/leveldb-bitcoin-fork" ] || unzip -d $YDEPS $YDL/leveldb-bitcoin-fork.zip
+cd $YDEPS/leveldb-bitcoin-fork && export YLDB=`pwd` || { echo -e "\n\n\n\nLevelDB not build.\n\n\n\n"; return 1; }
 
-make libmemenv.a libleveldb.a
+TARGET_OS=NATIVE_WINDOWS OPT="-std=gnu++0x -msse2" make libleveldb.a libmemenv.a
 
 if ! grep YLDB $YBASE/scripts/ydeps > /dev/null; then echo "YLDB=$YLDB" >> $YBASE/scripts/ydeps; fi
 
