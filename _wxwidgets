@@ -1,0 +1,49 @@
+########################################################################################
+# wxWidgets
+
+if [ -z "$YOS" ]; then
+echo -e "\n\n\nYOS not set.\nAborting build\n\n\n"
+else
+
+if [ "$1" == "check" ]; then
+############################ Check if exists
+case $YOS in
+  linux*) [ -d "$YWX/lib" ] && [ `find $YWX/lib/* -prune -name "*.so" | wc -l` -gt 16 ] && echo "found";;
+  *) [ -d "$YWX/lib/gcc_lib" ] && [ `find $YWX/lib/gcc_lib/* -prune -name "*.a" ! -name "*.dll.a" | wc -l` -gt 21 ] && echo "found";;
+esac
+
+else
+############################ Build
+case $YOS in
+########################################## Linux
+linux*)
+
+../configure CXXFLAGS="-std=gnu++0x -Wno-unused-variable -Wno-deprecated-declarations" --disable-debug_flag --prefix=`pwd`/build
+make
+make install
+
+;;
+########################################## Mac OSX
+darwin*)
+
+../configure --enable-macosx_arch=x86_64 --with-macosx-sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk --with-macosx-version-min=10.6 --disable-debug_flag --disable-shared --prefix=`pwd`/build
+make
+make install
+
+;;
+########################################## Windows
+*)
+
+../configure CXX="g++ -std=gnu++0x" CXXFLAGS="-Wno-unused-variable -Wno-deprecated-declarations" LDFLAGS="-static -static-libgcc -static-libstdc++ -s" --build=x86-winnt-mingw32 --disable-shared --prefix=`pwd`/build
+make
+make install
+
+;;
+
+esac
+
+if ! grep YWX $YDIR/scripts/ydeps > /dev/null; then echo "YWX=$YWX" >> $YDIR/scripts/ydeps; fi
+if [ `echo $PATH | grep wxWidgets | wc -l` -eq 0 ]; then export PATH=$YWX/bin:$PATH; fi
+fi
+fi
+

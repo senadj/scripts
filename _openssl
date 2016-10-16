@@ -1,0 +1,52 @@
+########################################################################################
+# OpenSSL
+
+if [ -z "$YOS" ]; then
+echo -e "\n\n\nYOS not set.\nAborting build\n\n\n"
+else
+
+if [ "$1" == "check" ]; then
+############################ Check if exists
+case $YOS in
+  linux*) [ -d "$YOSSL/build/lib" ] && [ `find $YOSSL/build/lib/* -prune -name "*.so" | wc -l` -gt 1 ] && echo "found";;
+  *) [ -d "$YOSSL/build/lib" ] && [ `find $YOSSL/build/lib/* -prune -name "*.a" ! -name "*.dll.a" | wc -l` -gt 1 ] && echo "found";;
+esac
+
+else
+############################ Build
+case $YOS in
+########################################## Linux
+linux*)
+
+perl Configure linux-elf shared --openssldir=$YOSSL/build
+make
+make install
+
+;;
+########################################## Mac OSX
+darwin*)
+
+CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6"
+
+CC="clang ${CFLAGS}" ./Configure darwin64-x86_64-cc no-shared --openssldir=$YOSSL/build
+make build_libs build_apps
+make install_sw
+
+;;
+########################################## Windows
+*)
+
+perl Configure mingw no-shared --openssldir=`cygpath -m $YOSSL/build`
+cat Makefile | sed 's/^PERL=.*$/PERL=perl/' | sed 's/i486/i686\ -Wno-unused-value/' > tmpf
+mv tmpf Makefile
+make build_libs build_apps
+make install_sw
+
+;;
+
+esac
+
+if ! grep YOSSL $YDIR/scripts/ydeps > /dev/null; then echo "YOSSL=$YOSSL" >> $YDIR/scripts/ydeps; fi
+fi
+fi
+

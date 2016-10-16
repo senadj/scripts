@@ -1,0 +1,48 @@
+########################################################################################
+# libPNG
+
+if [ -z "$YOS" ]; then
+echo -e "\n\n\nYOS not set.\nAborting build\n\n\n"
+else
+
+if [ "$1" == "check" ]; then
+############################ Check if exists
+case $YOS in
+  linux*) [ -d "$YPNG/.libs" ] && [ -f "`find $YPNG/.libs/* -prune -name "*.so" | head -1`" ] && echo "found";;
+  *) [ -d "$YPNG/.libs" ] && [ -f "`find $YPNG/.libs/* -prune -name "*.a" ! -name "*.dll.a" | head -1`" ] && echo "found";;
+esac
+
+else
+############################ Build
+case $YOS in
+########################################## Linux
+linux*)
+
+./configure CPPFLAGS="-I $YZLIB" LDFLAGS="-L$YZLIB" --enable-static --enable-shared
+make
+
+;;
+########################################## Mac OSX
+darwin*)
+
+CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6" \
+./configure CPPFLAGS="-I $YZLIB" LDFLAGS="-L$YZLIB" --disable-shared --enable-static
+make
+
+;;
+########################################## Windows
+*)
+
+./configure CPPFLAGS="-I $YZLIB" LDFLAGS="-L$YZLIB" --disable-shared --enable-static
+cat Makefile | sed 's/\/usr\/bin\///' > tmpf
+mv tmpf Makefile
+make
+
+;;
+
+esac
+
+if ! grep YPNG $YDIR/scripts/ydeps > /dev/null; then echo "YPNG=$YPNG" >> $YDIR/scripts/ydeps; fi
+fi
+fi
+

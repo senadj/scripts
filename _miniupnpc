@@ -1,0 +1,40 @@
+########################################################################################
+# MiniUPNPc
+
+if [ -z "$YOS" ]; then
+echo -e "\n\n\nYOS not set.\nAborting build\n\n\n"
+else
+
+if [ "$1" == "check" ]; then
+############################ Check if exists
+case $YOS in
+  linux*) [ -d "$YUPNP" ] && [ -f "`find $YUPNP/* -prune -name "*.so" | head -1`" ] && echo "found";;
+  *) [ -d "$YUPNP" ] && [ -f "$YUPNP/libminiupnpc.a" ] && echo "found";;
+esac
+
+else
+############################ Build
+case $YOS in
+########################################## Linux
+linux*)
+
+make
+;;
+########################################## Mac OSX
+darwin*)
+
+CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6" \
+make upnpc-static
+;;
+########################################## Windows
+*)
+
+make -f Makefile.mingw upnpc-static
+;;
+
+esac
+
+if ! grep YUPNP $YDIR/scripts/ydeps > /dev/null; then echo "YUPNP=$YUPNP" >> $YDIR/scripts/ydeps; fi
+fi
+fi
+

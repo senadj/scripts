@@ -1,0 +1,54 @@
+########################################################################################
+# Boost
+
+if [ -z "$YOS" ]; then
+echo -e "\n\n\nYOS not set.\nAborting build\n\n\n"
+else
+
+if [ "$1" == "check" ]; then
+############################ Check if exists
+case $YOS in
+  linux*) [ -d "$YBOO/stage/lib" ] && [ -f "`find $YBOO/stage/lib/* -prune -name "*.so" | head -1`" ] && echo "found";;
+  *) [ -d "$YBOO/stage/lib" ] && [ `find $YBOO/stage/lib/* -prune -name "*.a" ! -name "*.dll.a" | wc -l` -gt 6 ] && echo "found";;
+esac
+
+else
+############################ Build
+case $YOS in
+########################################## Linux
+linux*)
+
+./bootstrap.sh
+./b2 -a cxxflags="-std=gnu++0x" --with-chrono --with-filesystem --with-regex --with-program_options --with-system --with-thread --with-date_time --with-serialization --with-iostreams -s ZLIB_SOURCE="$YZLIB" -s NO_BZIP2=1 threading=multi variant=release stage
+
+;;
+########################################## Mac OSX
+darwin*)
+
+CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6"
+./bootstrap.sh
+./b2 cxxflags="${CFLAGS}" --with-chrono --with-filesystem --with-regex --with-program_options --with-system --with-thread --with-date_time --with-serialization --with-iostreams -s ZLIB_SOURCE="$YZLIB" -s NO_BZIP2=1 --link=static --runtime-link=static threading=multi variant=release stage
+
+;;
+########################################## Windows
+*)
+
+cp $YDIR/scripts/cmdboost.bat .
+
+if ! grep Q_MOC_RUN $YBOO/boost/type_traits/detail/has_binary_operator.hpp > /dev/null; then
+echo "#ifndef Q_MOC_RUN" > tmpf
+cat $YBOO/boost/type_traits/detail/has_binary_operator.hpp >> tmpf
+echo "#endif // Q_MOC_RUN" >> tmpf
+mv tmpf $YBOO/boost/type_traits/detail/has_binary_operator.hpp
+fi
+
+start cmdboost.bat
+
+;;
+
+esac
+
+if ! grep YBOO $YDIR/scripts/ydeps > /dev/null; then echo "YBOO=$YBOO" >> $YDIR/scripts/ydeps; fi
+fi
+fi
+

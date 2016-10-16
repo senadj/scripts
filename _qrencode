@@ -1,0 +1,50 @@
+########################################################################################
+# QRencode
+
+if [ -z "$YOS" ]; then
+echo -e "\n\n\nYOS not set.\nAborting build\n\n\n"
+else
+
+if [ "$1" == "check" ]; then
+############################ Check if exists
+case $YOS in
+  linux*) [ -d "$YQR/.libs" ] && [ -f "`find $YQR/.libs/* -prune -name "*.so" | head -1`" ] && echo "found";;
+  *) [ -d "$YQR/.libs" ] && [ -f "$YQR/.libs/libqrencode.a" ] && echo "found";;
+esac
+
+else
+############################ Build
+
+pnglib=`find $YPNG/.libs/* -prune -name "*.a" ! -name "*.dll.a" | awk -Flib '{print $(NF)}' | cut -d'.' -f1`
+
+case $YOS in
+########################################## Linux
+linux*)
+
+./configure png_CFLAGS="-I $YPNG" png_LIBS="-L$YPNG/.libs -l$pnglib" --enable-static --enable-shared --without-tools
+make
+
+;;
+########################################## Mac OSX
+darwin*)
+
+CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6" \
+CPPFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6" \
+./configure png_CFLAGS="-I $YPNG" png_LIBS="-L$YPNG/.libs -l$pnglib" --disable-shared --without-tools
+make
+
+;;
+########################################## Windows
+*)
+
+./configure LDFLAGS="-static -static-libgcc -s" png_CFLAGS="-I $YPNG" png_LIBS="-L$YPNG/.libs -l$pnglib" --disable-shared --without-tools
+make
+
+;;
+
+esac
+
+if ! grep YQR $YDIR/scripts/ydeps > /dev/null; then echo "YQR=$YQR" >> $YDIR/scripts/ydeps; fi
+fi
+fi
+

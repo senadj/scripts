@@ -1,0 +1,43 @@
+########################################################################################
+# LevelDB
+
+if [ -z "$YOS" ]; then
+echo -e "\n\n\nYOS not set.\nAborting build\n\n\n"
+else
+
+if [ "$1" == "check" ]; then
+############################ Check if exists
+case $YOS in
+  linux*) [ -d "$YLDB" ] && [ -f "`find $YLDB/* -prune -name "*.so" | head -1`" ] && echo "found";;
+  *) [ -d "$YLDB" ] && [ -f "$YLDB/libleveldb.a" ] && echo "found";;
+esac
+
+else
+############################ Build
+case $YOS in
+########################################## Linux
+linux*)
+
+make all libmemenv.a
+
+;;
+########################################## Mac OSX
+darwin*)
+
+CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6"
+TARGET_OS=Darwin OPT="${CFLAGS}" make libleveldb.a libmemenv.a
+
+;;
+########################################## Windows
+*)
+
+TARGET_OS=NATIVE_WINDOWS OPT="-std=gnu++0x -msse2" make libleveldb.a libmemenv.a
+
+;;
+
+esac
+
+if ! grep YLDB $YDIR/scripts/ydeps > /dev/null; then echo "YLDB=$YLDB" >> $YDIR/scripts/ydeps; fi
+fi
+fi
+

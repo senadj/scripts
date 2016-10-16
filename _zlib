@@ -1,0 +1,43 @@
+########################################################################################
+# zlib
+
+if [ -z "$YOS" ]; then
+echo -e "\n\n\nYOS not set.\nAborting build\n\n\n"
+else
+
+if [ "$1" == "check" ]; then
+############################ Check if exists
+case $YOS in
+  linux*) [ -d "$YZLIB" ] && [ -f "`find $YZLIB/* -prune -name "*.so" | head -1`" ] && echo "found";;
+  *) [ -d "$YZLIB" ] && [ -f "$YZLIB/libz.a" ] && echo "found";;
+esac
+
+else
+############################ Build
+case $YOS in
+########################################## Linux
+linux*)
+
+./configure
+make
+;;
+########################################## Mac OSX
+darwin*)
+
+#CC=gcc-4.8 CXX=g++-4.8 LDFLAGS="-static-libgcc -static-libstdc++" \
+CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6" \
+./configure --static
+make
+;;
+########################################## Windows
+*)
+
+make -f win32/Makefile.gcc libz.a
+;;
+
+esac
+
+if ! grep YZLIB $YDIR/scripts/ydeps > /dev/null; then echo "YZLIB=$YZLIB" >> $YDIR/scripts/ydeps; fi
+fi
+fi
+
