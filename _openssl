@@ -18,7 +18,15 @@ case $YOS in
 ########################################## Linux
 linux*)
 
+case $YOS in
+*64*)
+perl Configure linux-x86_64 shared --openssldir=$YOSSL/build
+;;
+*)
 perl Configure linux-elf shared --openssldir=$YOSSL/build
+;;
+esac
+
 make
 make install
 
