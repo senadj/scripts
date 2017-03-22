@@ -1,0 +1,47 @@
+########################################################################################
+# libevent
+
+if [ -z "$YOS" ]; then
+echo -e "\n\n\nYOS not set.\nAborting build\n\n\n"
+else
+
+if [ "$1" == "check" ]; then
+############################ Check if exists
+case $YOS in
+  linux*) [ -d "$YEVT/.libs" ] && [ -f "`find $YEVT/.libs/* -prune -name "*.so" | head -1`" ] && echo "found";;
+  *) [ -d "$YEVT/.libs" ] && [ -f "`find $YEVT/.libs/* -prune -name "*.a" ! -name "*.dll.a" | head -1`" ] && echo "found";;
+esac
+
+else
+############################ Build
+case $YOS in
+########################################## Linux
+linux*)
+
+./configure --enable-static --enable-shared
+make
+
+;;
+########################################## Mac OSX
+darwin*)
+
+CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6" \
+./configure --disable-shared --enable-static
+make
+
+;;
+########################################## Windows
+*)
+
+./configure --disable-shared --enable-static
+sed -i 's/\/usr\/bin\///' Makefile
+make libevent.la
+
+;;
+
+esac
+
+if ! grep YEVT $YDIR/scripts/ydeps > /dev/null; then echo "YEVT=$YEVT" >> $YDIR/scripts/ydeps; fi
+fi
+fi
+

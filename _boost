@@ -33,7 +33,11 @@ CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.pl
 ########################################## Windows
 *)
 
+if [ -f "$YZLIB/libz.a" ]; then
+sed 's/--with-date_time/--with-date_time\ --with-iostreams\ -s\ ZLIB_SOURCE="%YZLIB%"/' $YDIR/scripts/cmdboost.bat > ./cmdboost.bat
+else
 cp $YDIR/scripts/cmdboost.bat .
+fi
 
 if ! grep Q_MOC_RUN $YBOO/boost/type_traits/detail/has_binary_operator.hpp > /dev/null; then
 echo "#ifndef Q_MOC_RUN" > tmpf
