@@ -35,7 +35,7 @@ make
 
 ./configure --disable-shared --enable-static
 sed -i 's/\/usr\/bin\///' Makefile
-make libevent.la
+make
 
 ;;
 

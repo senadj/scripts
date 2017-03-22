@@ -69,6 +69,7 @@ do
     leveldb*) YLDB=$file; echo "YLDB=$YLDB"; export YLDB ;;
     miniupnp*) YUPNP=$file; echo "YUPNP=$YUPNP"; export YUPNP ;;
     zlib*) YZLIB=$file; echo "YZLIB=$YZLIB"; export YZLIB ;;
+    libevent*) YEVT=$file; echo "YEVT=$YEVT"; export YEVT ;;
     libpng*) YPNG=$file; echo "YPNG=$YPNG"; export YPNG ;;
     qrenc*) YQR=$file; echo "YQR=$YQR"; export YQR ;;
     qt*) YQT=$file; echo "YQT=$YQT"; export YQT ;;
@@ -84,8 +85,8 @@ done
 ############# unset Y env vars #############
 udeps()
 {
-unset YBOO; unset YBOOSUFFIX; unset YOSSL;unset YBDB;unset YUPNP;unset YZLIB;unset YPNG;unset YQR;unset YQT;unset YWX;unset YPCRE;unset YJANS;unset YCURL;unset YLDB;
-echo -e "\nvariables unset:\nYBOO YOSSL YBDB YUPNP YZLIB YPNG YQR YQT YWX YPCRE YJANS YCURL YLDB"
+unset YBOO; unset YBOOSUFFIX; unset YOSSL;unset YBDB;unset YUPNP;unset YZLIB;unset YPNG;unset YQR;unset YQT;unset YWX;unset YPCRE;unset YJANS;unset YCURL;unset YLDB;unset YEVT;
+echo -e "\nvariables unset:\nYBOO YOSSL YBDB YUPNP YZLIB YPNG YQR YQT YWX YPCRE YJANS YCURL YLDB YEVT"
 }
 
 ############# find dependency starting with $1 in YDEPS folder #############
@@ -139,5 +140,5 @@ esac
 [ -d "$YPCRE" ] && export YPCRE
 [ -d "$YJANS" ] && export YJANS
 [ -d "$YCURL" ] && export YCURL
-
+[ -d "$YEVT" ] && export YEVT
 

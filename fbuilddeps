@@ -142,7 +142,7 @@ mkdir -p $YWX/stage && cd $YWX/stage
 source $YDIR/scripts/_wxwidgets
 }
 
-export -f buildzlib buildopenssl buildberkeleydb buildboost buildminiupnpc buildlibpng buildqrencode buildpcre buildjansson buildcurl buildleveldb buildqt buildwxwidgets
+export -f buildzlib buildopenssl buildberkeleydb buildboost buildminiupnpc buildlibevent buildlibpng buildqrencode buildpcre buildjansson buildcurl buildleveldb buildqt buildwxwidgets
 
 
 
