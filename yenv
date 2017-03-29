@@ -127,7 +127,8 @@ esac
 
 
 [ -d "$YQT" ] && PATH=$PATH:$YQT/bin && export YQT
-[ -d "$YWX" ] && PATH=$YWX/bin:$PATH && export YWX
+[ -d "$YWX" ] && export YWX
+[ -f "$YWX/bin/wx-config" ] && PATH=$YWX/bin:$PATH
 
 [ -d "$YBOO" ] && export YBOO YBOOSUFFIX
 [ -d "$YOSSL" ] && export YOSSL

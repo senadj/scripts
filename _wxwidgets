@@ -13,12 +13,13 @@ case $YOS in
 esac
 
 else
+wxprefix=`pwd`/build
 ############################ Build
 case $YOS in
 ########################################## Linux
 linux*)
 
-../configure CXXFLAGS="-std=gnu++0x -Wno-unused-variable -Wno-deprecated-declarations" --disable-debug_flag --prefix=`pwd`/build
+../configure CXXFLAGS="-std=gnu++0x -Wno-unused-variable -Wno-deprecated-declarations" --disable-debug_flag --prefix=$wxprefix
 make
 make install
 
@@ -26,7 +27,7 @@ make install
 ########################################## Mac OSX
 darwin*)
 
-../configure --enable-macosx_arch=x86_64 --with-macosx-sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk --with-macosx-version-min=10.6 --disable-debug_flag --disable-shared --prefix=`pwd`/build
+../configure --enable-macosx_arch=x86_64 --with-macosx-sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk --with-macosx-version-min=10.6 --disable-debug_flag --disable-shared --prefix=$wxprefix
 make
 make install
 
@@ -34,16 +35,36 @@ make install
 ########################################## Windows
 *)
 
-../configure CXX="g++ -std=gnu++0x" CXXFLAGS="-Wno-unused-variable -Wno-deprecated-declarations" LDFLAGS="-static -static-libgcc -static-libstdc++ -s" --build=x86-winnt-mingw32 --disable-shared --prefix=`pwd`/build
+# CXXFLAGS are ignored
+../configure CXX="g++ -std=gnu++0x -Wno-unused-variable -Wno-deprecated-declarations" LDFLAGS="-static -static-libgcc -static-libstdc++ -s" --build=x86-winnt-mingw32 --disable-shared --disable-debug_flag --prefix=$wxprefix
+
+YTMP=`cygpath -m $YDIR | sed 's/\//\\\\\//g'`
+find . -name Makefile | xargs sed -i 's/\ \'$YDIR'/\ '$YTMP'/'
+find . -name Makefile | xargs sed -i 's/\/usr\/bin\///'
+
 make
 make install
+
+# workaround due bug in make install
+YRSRC=-`echo $YDIR | sed 's/\//\\\\\//g'`
+YRTGT=-`cygpath -m $YDIR | sed 's/\//\\\\\//g'`
+sed -i "s/${YRSRC}/${YRTGT}/" $wxprefix/bin/wx-config
+YTMP="$wxprefix/include/"`ls $wxprefix/include | sed 's/\///'`
+cp -r ../include/wx $YTMP/
+rm -f $YTMP/wx/msw/setup.h
+( cd $YTMP/wx; rm -r android cocoa dfb gtk gtk1 motif msdos os2 osx private univ unix x11 qt )
+rm -rf `find $YTMP -type d -name wince`
+
+echo "ignore errors, try wx-config"
 
 ;;
 
 esac
 
+[ -d "$YWX/bin" ] || mkdir $YWX/bin
+[ -f "$YWX/bin/wx-config" ] || cp $wxprefix/bin/wx-config $YWX/bin/
 if ! grep YWX $YDIR/scripts/ydeps > /dev/null; then echo "YWX=$YWX" >> $YDIR/scripts/ydeps; fi
-if [ `echo $PATH | grep wxWidgets | wc -l` -eq 0 ]; then export PATH=$YWX/bin:$PATH; fi
+if [ `echo $PATH | grep wx | wc -l` -eq 0 ]; then export PATH=$WX/bin:$PATH; fi
 fi
 fi
 
