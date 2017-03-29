@@ -7,10 +7,7 @@ else
 
 if [ "$1" == "check" ]; then
 ############################ Check if exists
-case $YOS in
-  linux*) [ -d "$YWX/lib" ] && [ `find $YWX/lib/* -prune -name "*.so" | wc -l` -gt 16 ] && echo "found";;
-  *) [ -d "$YWX/lib/gcc_lib" ] && [ `find $YWX/lib/gcc_lib/* -prune -name "*.a" ! -name "*.dll.a" | wc -l` -gt 21 ] && echo "found";;
-esac
+[ -f "$YWX/bin/wx-config" ] && echo "found"
 
 else
 wxprefix=`pwd`/build
@@ -45,7 +42,7 @@ find . -name Makefile | xargs sed -i 's/\/usr\/bin\///'
 make
 make install
 
-# workaround due bug in make install
+# work around bug in make install under msys
 YRSRC=-`echo $YDIR | sed 's/\//\\\\\//g'`
 YRTGT=-`cygpath -m $YDIR | sed 's/\//\\\\\//g'`
 sed -i "s/${YRSRC}/${YRTGT}/" $wxprefix/bin/wx-config
