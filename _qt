@@ -19,7 +19,7 @@ case $YOS in
 linux*)
 
 case $YOS in *64*) YTMP="-64";; *) YTMP=;; esac
-if ! grep QMAKE_CXXFLAGS mkspecs/linux-g++$YTMP/qmake.conf > /dev/null; then sed -i '1 i\QMAKE_CXXFLAGS *= -std=gnu++0x' mkspecs/linux-g++$YTMP/qmake.conf; fi
+if ! grep QMAKE_CXXFLAGS $YQT/mkspecs/linux-g++$YTMP/qmake.conf > /dev/null; then sed -i '1 i\QMAKE_CXXFLAGS *= -std=gnu++0x' $YQT/mkspecs/linux-g++$YTMP/qmake.conf; fi
 ./configure -prefix $YQT -platform linux-g++$YTMP -release -shared -opensource -confirm-license -no-sql-sqlite -no-qt3support -no-opengl -qt-zlib -no-gif -qt-libpng -qt-libmng -no-libtiff -qt-libjpeg -no-openssl -no-dbus -no-phonon -no-phonon-backend -no-multimedia -no-audio-backend -no-webkit -no-script -no-scripttools -no-declarative -no-declarative-debug -nomake demos -nomake examples
 make
 
@@ -38,9 +38,7 @@ make install
 ########################################## Windows
 *)
 
-head -1 $YQT/mkspecs/win32-g++-4.6/qmake.conf > tmpf
-echo "QMAKE_CXXFLAGS *= -std=gnu++0x" >> tmpf
-echo "QMAKE_LFLAGS = -static -static-libgcc -static-libstdc++ -s" >> tmpf
+echo -e "include(../win32-g++/qmake.conf)\nQMAKE_CXXFLAGS *= -std=gnu++0x\nQMAKE_LFLAGS = -static -static-libgcc -static-libstdc++ -s" > tmpf
 mv tmpf $YQT/mkspecs/win32-g++-4.6/qmake.conf
 
 sed s/-static-libgcc/-static\ -static-libgcc\ -static-libstdc++/ $YQT/qmake/Makefile.win32-g++ > tmpf
