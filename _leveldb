@@ -5,11 +5,13 @@ if [ -z "$YOS" ]; then
 echo -e "\n\n\nYOS not set.\nAborting build\n\n\n"
 else
 
+[ -d "$YLDB" ] || export YLDB=$YSW/`pwd | xargs basename`
+
 if [ "$1" == "check" ]; then
 ############################ Check if exists
 case $YOS in
-  linux*) [ -d "$YLDB" ] && [ -f "`find $YLDB/* -prune -name "*.so" | head -1`" ] && echo "found";;
-  *) [ -d "$YLDB" ] && [ -f "$YLDB/libleveldb.a" ] && echo "found";;
+  linux*) [ -d "$YLDB" ] && [ -f "`find $YLDB/lib/* -prune -name "*.so" | head -1`" ] && echo "found";;
+  *) [ -d "$YLDB" ] && [ -f "$YLDB/lib/libleveldb.a" ] && echo "found";;
 esac
 
 else
@@ -31,13 +33,13 @@ TARGET_OS=Darwin OPT="${CFLAGS}" make libleveldb.a libmemenv.a
 ########################################## Windows
 *)
 
-TARGET_OS=NATIVE_WINDOWS OPT="-std=gnu++0x -msse2" make libleveldb.a libmemenv.a
+TARGET_OS=NATIVE_WINDOWS OPT="-std=gnu++0x -msse2" LDFLAGS='-static -static-libgcc -s' make libleveldb.a libmemenv.a
 
 ;;
 
 esac
 
-if ! grep YLDB $YDIR/scripts/ydeps > /dev/null; then echo "YLDB=$YLDB" >> $YDIR/scripts/ydeps; fi
+if ! grep YLDB $YSW/yconf > /dev/null; then echo "YLDB=$YLDB" >> $YSW/yconf; fi
 fi
 fi
 

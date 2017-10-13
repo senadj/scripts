@@ -5,11 +5,13 @@ if [ -z "$YOS" ]; then
 echo -e "\n\n\nYOS not set.\nAborting build\n\n\n"
 else
 
+[ -d "$YPNG" ] || export YPNG=$YSW/`pwd | xargs basename`
+
 if [ "$1" == "check" ]; then
 ############################ Check if exists
 case $YOS in
-  linux*) [ -d "$YPNG/.libs" ] && [ -f "`find $YPNG/.libs/* -prune -name "*.so" | head -1`" ] && echo "found";;
-  *) [ -d "$YPNG/.libs" ] && [ -f "`find $YPNG/.libs/* -prune -name "*.a" ! -name "*.dll.a" | head -1`" ] && echo "found";;
+  linux*) [ -d "$YPNG/lib" ] && [ -f "`find $YPNG/lib/* -prune -name "*.so" | head -1`" ] && echo "found";;
+  *) [ -d "$YPNG/lib" ] && [ -f "`find $YPNG/lib/* -prune -name "*.a" ! -name "*.dll.a" | head -1`" ] && echo "found";;
 esac
 
 else
@@ -18,31 +20,30 @@ case $YOS in
 ########################################## Linux
 linux*)
 
-./configure CPPFLAGS="-I $YZLIB" LDFLAGS="-L$YZLIB" --enable-static --enable-shared
-make
+./configure CPPFLAGS="-I $YZLIB" LDFLAGS="-L$YZLIB" --enable-static --enable-shared --prefix=$YPNG
+make && make install
 
 ;;
 ########################################## Mac OSX
 darwin*)
 
 CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6" \
-./configure CPPFLAGS="-I $YZLIB" LDFLAGS="-L$YZLIB" --disable-shared --enable-static
-make
+./configure CPPFLAGS="-I $YZLIB" LDFLAGS="-L$YZLIB" --disable-shared --enable-static --prefix=$YPNG
+make && make install
 
 ;;
 ########################################## Windows
 *)
 
-./configure CPPFLAGS="-I $YZLIB" LDFLAGS="-L$YZLIB" --disable-shared --enable-static
-cat Makefile | sed 's/\/usr\/bin\///' > tmpf
-mv tmpf Makefile
-make
+./configure CPPFLAGS="-I $YZLIB" LDFLAGS="-L$YZLIB" --disable-shared --enable-static --prefix=$YPNG
+sed -i 's/\/usr\/bin\///' Makefile
+make && make install
 
 ;;
 
 esac
 
-if ! grep YPNG $YDIR/scripts/ydeps > /dev/null; then echo "YPNG=$YPNG" >> $YDIR/scripts/ydeps; fi
+if ! grep YPNG $YSW/yconf > /dev/null; then echo "YPNG=$YPNG" >> $YSW/yconf; fi
 fi
 fi
 

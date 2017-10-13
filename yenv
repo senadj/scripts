@@ -2,13 +2,15 @@
 [ -d "$YDIR" ] || { echo "YDIR path invalid. Aborting."; return 1; }
 [ -d "$YDIR/scripts" ] || { echo "scripts path invalid. Aborting."; return 1; }
 
-alias ymake='make -f $YDIR/scripts/makefile'
+# alias ymake='make -f $YDIR/scripts/makefile'
 
 YDL="$YDIR/downloads"
-YDEPS="$YDIR/deps"
+YSTAGE="$YDIR/stage"
+YSW="$YDIR/sw"
 
 [ -d "$YDL" ] || mkdir -p $YDL
-[ -d "$YDEPS" ] || mkdir -p $YDEPS
+[ -d "$YSTAGE" ] || mkdir -p $YSTAGE
+[ -d "$YSW" ] || mkdir -p $YSW
 
 case "$YOS" in mingw*)
   [ -d "$YDIR/gcc" ] || mkdir -p $YDIR/gcc
@@ -16,7 +18,7 @@ case "$YOS" in mingw*)
 esac
 
 
-############# eXtract dependencies in YDL folder to YDEPS folder #############
+############# eXtract files in YDL folder to YSTAGE folder #############
 xdeps ()
 {
   if [ $# -eq 0 ]; then
@@ -28,22 +30,22 @@ xdeps ()
 
   [ -z "$YDL" ] && { echo "YDL not set. Aborting."; return 1; }
   [ -d "$YDL" ] || { echo "YDL not set correctly. Aborting."; return 1; }
-  [ -z "$YDEPS" ] && { echo "YDEPS not set. Aborting."; return 1; }
-  [ -d "$YDEPS" ] || { echo "YDEPS not set correctly. Aborting."; return 1; }
-  [ -f "$YDL/$1" ] || { echo "File $YDEPS/$1 not Found. Aborting."; return 1; }
+  [ -z "$YSTAGE" ] && { echo "YSTAGE not set. Aborting."; return 1; }
+  [ -d "$YSTAGE" ] || { echo "YSTAGE not set correctly. Aborting."; return 1; }
+  [ -f "$YDL/$1" ] || { echo "File $YDL/$1 not Found. Aborting."; return 1; }
 
   case "$1" in
-    *.tar.gz) tar -zxvf $YDL/$1 -C $YDEPS ;;
-    *.tar.bz2) tar -jxvf $YDL/$1 -C $YDEPS ;;
-    *.7z) 7za x -aoa $YDL/$1 -o$YDEPS ;;
+    *.tar.gz) tar -zxvf $YDL/$1 -C $YSTAGE ;;
+    *.tar.bz2) tar -jxvf $YDL/$1 -C $YSTAGE ;;
+    *.7z) 7za x -aoa $YDL/$1 -o$YSTAGE ;;
     *) echo "File Format Unsupported $1" ;;
   esac
 }
 
-############# set Y vars using directories in YDEPS folder #############
+############# set Y vars using directories in YSTAGE folder #############
 sdeps()
 {
-for file in `find $YDEPS/* -prune -type d`
+for file in `find $YSW/* -prune -type d`
 do
   filename=$(basename $file)
 
@@ -55,15 +57,7 @@ do
   fi
 
   case $filename in
-    boost*) YBOO=$file
-            echo "YBOO=$YBOO"
-            export YBOO
-            case "$YOS" in
-              linux*) [ -d "$YBOO/stage/lib" ] && YBOOSUFFIX=`find $YBOO/stage/lib -name "libboost_filesystem*.so" | head -1 | awk -Ffilesystem '{print $(NF)}' | cut -d'.' -f1`;;
-              *)      [ -d "$YBOO/stage/lib" ] && YBOOSUFFIX=`find $YBOO/stage/lib -name "libboost_filesystem*.a" | head -1 | awk -Ffilesystem '{print $(NF)}' | cut -d'.' -f1`;; 
-            esac
-            echo "YBOOSUFFIX=$YBOOSUFFIX"
-            export YBOOSUFFIX ;;
+    boost*) YBOO=$file; echo "YBOO=$YBOO"; export YBOO ;;
     openssl*) YOSSL=$file; echo "YOSSL=$YOSSL"; export YOSSL ;;
     db*) YBDB=$file; echo "YBDB=$YBDB"; export YBDB ;;
     leveldb*) YLDB=$file; echo "YLDB=$YLDB"; export YLDB ;;
@@ -85,20 +79,20 @@ done
 ############# unset Y env vars #############
 udeps()
 {
-unset YBOO; unset YBOOSUFFIX; unset YOSSL;unset YBDB;unset YUPNP;unset YZLIB;unset YPNG;unset YQR;unset YQT;unset YWX;unset YPCRE;unset YJANS;unset YCURL;unset YLDB;unset YEVT;
+unset YBOO; unset YOSSL;unset YBDB;unset YUPNP;unset YZLIB;unset YPNG;unset YQR;unset YQT;unset YWX;unset YPCRE;unset YJANS;unset YCURL;unset YLDB;unset YEVT;
 echo -e "\nvariables unset:\nYBOO YOSSL YBDB YUPNP YZLIB YPNG YQR YQT YWX YPCRE YJANS YCURL YLDB YEVT"
 }
 
-############# find dependency starting with $1 in YDEPS folder #############
+############# find dependency starting with $1 in YSTAGE folder #############
 fdeps()
 {
-find $YDEPS/* -prune -type d -name "$1*" | sort;
+find $YSTAGE/* -prune -type d -name "$1*" | sort;
 }
 
 ############# print current dependancies #############
 pdeps()
 {
-env | grep "^Y" | egrep -v "^YDL|^YDEPS|^YDIR" | sort
+env | grep "^Y" | egrep -v "^YDL|^YSTAGE|^YDIR" | sort
 }
 
 ############# Print info from environment #############
@@ -113,10 +107,10 @@ cat $YDIR/scripts/makefile | grep -e "^[[:alpha:]]" | grep -v "SELF_DIR" | awk '
 }
 
 ##############################################################################
-if [ -f "$YDIR/scripts/ydeps" ]; then
-source $YDIR/scripts/ydeps
+if [ -f "$YSW/yconf" ]; then
+source $YSW/yconf
 else
-touch $YDIR/scripts/ydeps
+touch $YSW/yconf
 fi
 
 [ -f "$YDIR/scripts/fbuilddeps" ] && source $YDIR/scripts/fbuilddeps
@@ -128,9 +122,7 @@ esac
 
 [ -d "$YQT" ] && PATH=$PATH:$YQT/bin && export YQT
 [ -d "$YWX" ] && export YWX
-[ -f "$YWX/bin/wx-config" ] && PATH=$YWX/bin:$PATH && YTMP=`wx-config --prefix` && PATH=`cygpath $YTMP`/lib:$PATH
-
-[ -d "$YBOO" ] && export YBOO YBOOSUFFIX
+[ -d "$YBOO" ] && export YBOO
 [ -d "$YOSSL" ] && export YOSSL
 [ -d "$YBDB" ] && export YBDB
 [ -d "$YLDB" ] && export YLDB
@@ -143,3 +135,4 @@ esac
 [ -d "$YCURL" ] && export YCURL
 [ -d "$YEVT" ] && export YEVT
 
+#[ -f "$YWX/bin/wx-config" ] && PATH=$YWX/bin:$PATH && YTMP=`wx-config --prefix` && PATH=`cygpath $YTMP`/lib:$PATH
