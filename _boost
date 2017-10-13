@@ -34,7 +34,7 @@ CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.pl
 *)
 
 if [ -f "$YZLIB/libz.a" ]; then
-sed 's/--with-date_time/--with-date_time\ --with-iostreams\ -s\ ZLIB_SOURCE="%YZLIB%"/' $YDIR/scripts/cmdboost.bat > ./cmdboost.bat
+sed 's/--with-date_time/--with-date_time\ --with-serialization\ --with-iostreams\ -s\ ZLIB_SOURCE="%YZLIB%"/' $YDIR/scripts/cmdboost.bat > ./cmdboost.bat
 else
 cp $YDIR/scripts/cmdboost.bat .
 fi

@@ -38,17 +38,12 @@ make install
 ########################################## Windows
 *)
 
-echo -e "include(../win32-g++/qmake.conf)\nQMAKE_CXXFLAGS *= -std=gnu++0x\nQMAKE_LFLAGS = -static -static-libgcc -static-libstdc++ -s" > tmpf
-mv tmpf $YQT/mkspecs/win32-g++-4.6/qmake.conf
-
-sed s/-static-libgcc/-static\ -static-libgcc\ -static-libstdc++/ $YQT/qmake/Makefile.win32-g++ > tmpf
-mv tmpf $YQT/qmake/Makefile.win32-g++
-
-sed s/-static-libgcc/-static\ -static-libgcc/ $YQT/qmake/Makefile.win32-g++-sh > tmpf
-mv tmpf $YQT/qmake/Makefile.win32-g++-sh
+echo -e "include(../win32-g++/qmake.conf)\nQMAKE_CXXFLAGS *= -std=gnu++0x\nQMAKE_LFLAGS = -static -static-libgcc -static-libstdc++ -s" > $YQT/mkspecs/win32-g++-4.6/qmake.conf
+if ! grep libstdc++ $YQT/qmake/Makefile.win32-g++ > /dev/null; then sed -i 's/-static-libgcc/-static -static-libgcc -static-libstdc++/' $YQT/qmake/Makefile.win32-g++; fi
+if ! grep 'static ' $YQT/qmake/Makefile.win32-g++-sh > /dev/null; then sed -i 's/-static-libgcc/-static -static-libgcc/' $YQT/qmake/Makefile.win32-g++-sh; fi
 
 awk -v addtxt=" && defined(SKIPHACK)" '/defined\(QT_NO_THREAD\)\ \&\&\ defined\(_POSIX_THREAD_SAFE_FUNCTIONS\)/ {$0=$0addtxt} 1' $YQT/src/corelib/tools/qdatetime.cpp > tmpf
-mv tmpf $YQT/src/corelib/tools/qdatetime.cpp
+if ! grep SKIPHACK $YQT/src/corelib/tools/qdatetime.cpp > /dev/null; then mv tmpf $YQT/src/corelib/tools/qdatetime.cpp; fi
 
 ./configure.exe -release -static -opensource -confirm-license -platform win32-g++-4.6 -no-sql-sqlite -no-qt3support -no-opengl -qt-zlib -no-gif -qt-libpng -qt-libmng -no-libtiff -qt-libjpeg -no-dsp -no-vcproj -no-openssl -no-dbus -no-phonon -no-phonon-backend -no-multimedia -no-audio-backend -no-webkit -no-script -no-scripttools -no-declarative -no-declarative-debug -qt-style-windows -qt-style-windowsxp -qt-style-windowsvista -no-style-plastique -no-style-cleanlooks -no-style-motif -no-style-cde -nomake demos -nomake examples
 make

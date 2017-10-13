@@ -14,9 +14,9 @@ buildopenssl()
 {
 [ -f "$YDIR/scripts/ydeps" ] && source $YDIR/scripts/ydeps
 [ ! -z `source $YDIR/scripts/_openssl check` ] && return 0
-[ -f "$YDL/openssl-1.0.1s.tar.gz" ] || ( cd $YDL && curl -LOk https://www.openssl.org/source/openssl-1.0.1s.tar.gz )
-[ -d "$YDEPS/openssl-1.0.1s" ] || tar -zxvf $YDL/openssl-1.0.1s.tar.gz -C $YDEPS
-cd $YDEPS/openssl-1.0.1s && export YOSSL=`pwd` || { echo -e "\n\n\n\nOpenSSL not build.\n\n\n\n"; return 1; }
+[ -f "$YDL/openssl-1.0.1u.tar.gz" ] || ( cd $YDL && curl -LOk https://www.openssl.org/source/openssl-1.0.1u.tar.gz )
+[ -d "$YDEPS/openssl-1.0.1u" ] || tar -zxvf $YDL/openssl-1.0.1u.tar.gz -C $YDEPS
+cd $YDEPS/openssl-1.0.1u && export YOSSL=`pwd` || { echo -e "\n\n\n\nOpenSSL not build.\n\n\n\n"; return 1; }
 source $YDIR/scripts/_openssl
 }
 ##########################################################################################
