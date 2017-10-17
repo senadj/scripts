@@ -2,6 +2,7 @@
 buildzlib()
 {
 [ -f "$YSW/yconf" ] && source $YSW/yconf
+[ -d "$YZLIB" ] || export YZLIB=$YSW/zlib-1.2.8
 [ ! -z `source $YDIR/scripts/_zlib check` ] && return 0
 [ -f "$YDL/zlib-1.2.8.tar.gz" ] || ( cd $YDL && curl -LOk http://sourceforge.net/projects/libpng/files/zlib/1.2.8/zlib-1.2.8.tar.gz )
 [ -d "$YSTAGE/zlib-1.2.8" ] || tar -zxvf $YDL/zlib-1.2.8.tar.gz -C $YSTAGE
@@ -13,6 +14,7 @@ source $YDIR/scripts/_zlib
 buildopenssl()
 {
 [ -f "$YSW/yconf" ] && source $YSW/yconf
+[ -d "$YOSSL" ] || export YOSSL=$YSW/openssl-1.0.1u
 [ ! -z `source $YDIR/scripts/_openssl check` ] && return 0
 [ -f "$YDL/openssl-1.0.1u.tar.gz" ] || ( cd $YDL && curl -LOk https://www.openssl.org/source/openssl-1.0.1u.tar.gz )
 [ -d "$YSTAGE/openssl-1.0.1u" ] || tar -zxvf $YDL/openssl-1.0.1u.tar.gz -C $YSTAGE
@@ -23,6 +25,7 @@ source $YDIR/scripts/_openssl
 buildberkeleydb()
 {
 [ -f "$YSW/yconf" ] && source $YSW/yconf
+[ -d "$YBDB" ] || export YBDB=$YSW/db-4.8.30.NC
 [ ! -z `source $YDIR/scripts/_berkeleydb check` ] && return 0
 [ -f "$YDL/db-4.8.30.NC.tar.gz" ] || ( cd $YDL && curl -LOk http://download.oracle.com/berkeley-db/db-4.8.30.NC.tar.gz )
 [ -d "$YSTAGE/db-4.8.30.NC" ] || tar -zxvf $YDL/db-4.8.30.NC.tar.gz -C $YSTAGE
@@ -34,6 +37,7 @@ source $YDIR/scripts/_berkeleydb
 buildboost()
 {
 [ -f "$YSW/yconf" ] && source $YSW/yconf
+[ -d "$YBOO" ] || export YBOO=$YSW/boost_1_58_0
 [ ! -z `source $YDIR/scripts/_boost check` ] && return 0
 [ -f "$YDL/boost_1_58_0.tar.bz2" ] || ( cd $YDL && curl -LOk http://sourceforge.net/projects/boost/files/boost/1.58.0/boost_1_58_0.tar.bz2 )
 [ -d "$YSTAGE/boost_1_58_0" ] || tar -jxvf $YDL/boost_1_58_0.tar.bz2 -C $YSTAGE
@@ -44,6 +48,7 @@ source $YDIR/scripts/_boost
 buildminiupnpc()
 {
 [ -f "$YSW/yconf" ] && source $YSW/yconf
+[ -d "$YUPNP" ] || export YUPNP=$YSW/miniupnpc-1.9.20150206
 [ ! -z `source $YDIR/scripts/_miniupnpc check` ] && return 0
 [ -f "$YDL/miniupnpc-1.9.20150206.tar.gz" ] || ( cd $YDL && curl -Lk http://miniupnp.free.fr/files/download.php?file=miniupnpc-1.9.20150206.tar.gz > miniupnpc-1.9.20150206.tar.gz )
 [ -d "$YSTAGE/miniupnpc-1.9.20150206" ] || tar -zxvf $YDL/miniupnpc-1.9.20150206.tar.gz -C $YSTAGE
@@ -54,6 +59,7 @@ source $YDIR/scripts/_miniupnpc
 buildlibpng()
 {
 [ -f "$YSW/yconf" ] && source $YSW/yconf
+[ -d "$YPNG" ] || export YPNG=$YSW/libpng-1.6.20
 [ ! -z `source $YDIR/scripts/_libpng check` ] && return 0
 [ -f "$YDL/libpng-1.6.20.tar.gz" ] || ( cd $YDL && curl -LOk https://sourceforge.net/projects/libpng/files/libpng16/older-releases/1.6.20/libpng-1.6.20.tar.gz )
 [ -d "$YSTAGE/libpng-1.6.20" ] || tar -zxvf $YDL/libpng-1.6.20.tar.gz -C $YSTAGE
@@ -64,6 +70,7 @@ source $YDIR/scripts/_libpng
 buildqrencode()
 {
 [ -f "$YSW/yconf" ] && source $YSW/yconf
+[ -d "$YQR" ] || export YQR=$YSW/qrencode-3.4.4
 [ ! -z `source $YDIR/scripts/_qrencode check` ] && return 0
 [ -f "$YDL/qrencode-3.4.4.tar.gz" ] || ( cd $YDL && curl -LOk https://fukuchi.org/works/qrencode/qrencode-3.4.4.tar.gz )
 [ -d "$YSTAGE/qrencode-3.4.4" ] || tar -zxvf $YDL/qrencode-3.4.4.tar.gz -C $YSTAGE
@@ -74,6 +81,7 @@ source $YDIR/scripts/_qrencode
 buildpcre()
 {
 [ -f "$YSW/yconf" ] && source $YSW/yconf
+[ -d "$YPCRE" ] || export YPCRE=$YSW/pcre-8.38
 [ ! -z `source $YDIR/scripts/_pcre check` ] && return 0
 [ -f "$YDL/pcre-8.38.tar.bz2" ] || ( cd $YDL && curl -LOk https://sourceforge.net/projects/pcre/files/pcre/8.38/pcre-8.38.tar.bz2 )
 [ -d "$YSTAGE/pcre-8.38" ] || tar -jxvf $YDL/pcre-8.38.tar.bz2 -C $YSTAGE
@@ -84,6 +92,7 @@ source $YDIR/scripts/_pcre
 buildjansson()
 {
 [ -f "$YSW/yconf" ] && source $YSW/yconf
+[ -d "$YJANS" ] || export YJANS=$YSW/jansson-2.7
 [ ! -z `source $YDIR/scripts/_jansson check` ] && return 0
 [ -f "$YDL/jansson-2.7.tar.gz" ] || ( cd $YDL && curl -LOk http://www.digip.org/jansson/releases/jansson-2.7.tar.gz )
 [ -d "$YSTAGE/jansson-2.7" ] || tar -zxvf $YDL/jansson-2.7.tar.gz -C $YSTAGE
@@ -94,6 +103,7 @@ source $YDIR/scripts/_jansson
 buildcurl()
 {
 [ -f "$YSW/yconf" ] && source $YSW/yconf
+[ -d "$YCURL" ] || export YCURL=$YSW/curl-7.48.0
 [ ! -z `source $YDIR/scripts/_curl check` ] && return 0
 [ -f "$YDL/curl-7.48.0.tar.bz2" ] || ( cd $YDL && curl -LOk https://curl.haxx.se/download/curl-7.48.0.tar.bz2 )
 [ -d "$YSTAGE/curl-7.48.0" ] || tar -jxvf $YDL/curl-7.48.0.tar.bz2 -C $YSTAGE
@@ -104,6 +114,7 @@ source $YDIR/scripts/_curl
 buildleveldb()
 {
 [ -f "$YSW/yconf" ] && source $YSW/yconf
+[ -d "$YLDB" ] || export YLDB=$YSW/leveldb-bitcoin-leveldb-1.17
 [ ! -z `source $YDIR/scripts/_leveldb check` ] && return 0
 [ -f "$YDL/bitcoin-leveldb-1.17.tar.gz" ] || ( cd $YDL && curl -LOk https://github.com/bitcoin-core/leveldb/archive/bitcoin-leveldb-1.17.tar.gz )
 [ -d "$YSTAGE/leveldb-bitcoin-leveldb-1.17" ] || tar -xvzf $YDL/bitcoin-leveldb-1.17.tar.gz -C $YSTAGE
@@ -114,6 +125,7 @@ source $YDIR/scripts/_leveldb
 buildlibevent()
 {
 [ -f "$YSW/yconf" ] && source $YSW/yconf
+[ -d "$YEVT" ] || export YEVT=$YSW/libevent-2.1.8-stable
 [ ! -z `source $YDIR/scripts/_libevent check` ] && return 0
 [ -f "$YDL/libevent-2.1.8-stable.tar.gz" ] || ( cd $YDL && curl -LOk https://github.com/libevent/libevent/releases/download/release-2.1.8-stable/libevent-2.1.8-stable.tar.gz )
 [ -d "$YSTAGE/libevent-2.1.8-stable" ] || tar -xvzf $YDL/libevent-2.1.8-stable.tar.gz -C $YSTAGE
@@ -124,6 +136,7 @@ source $YDIR/scripts/_libevent
 buildqt()
 {
 [ -f "$YSW/yconf" ] && source $YSW/yconf
+[ -d "$YQT" ] || export YQT=$YSW/qt-everywhere-opensource-src-4.8.6
 [ ! -z `source $YDIR/scripts/_qt check` ] && return 0
 [ -f "$YDL/qt-everywhere-opensource-src-4.8.6.tar.gz" ] || ( cd $YDL && curl -LOk http://download.qt.io/archive/qt/4.8/4.8.6/qt-everywhere-opensource-src-4.8.6.tar.gz )
 [ -d "$YSTAGE/qt-everywhere-opensource-src-4.8.6" ] || tar -zxvf $YDL/qt-everywhere-opensource-src-4.8.6.tar.gz -C $YSTAGE
@@ -134,6 +147,7 @@ source $YDIR/scripts/_qt
 buildwxwidgets()
 {
 [ -f "$YSW/yconf" ] && source $YSW/yconf
+[ -d "$YWX" ] || export YWX=$YSW/wxWidgets-3.1.0
 [ ! -z `source $YDIR/scripts/_wxwidgets check` ] && return 0
 [ -f "$YDL/wxWidgets-3.1.0.tar.bz2" ] || ( cd $YDL && curl -LOk https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.0/wxWidgets-3.1.0.tar.bz2 )
 [ -d "$YSTAGE/wxWidgets-3.1.0" ] || tar -jxvf $YDL/wxWidgets-3.1.0.tar.bz2 -C $YSTAGE
