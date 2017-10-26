@@ -1,4 +1,12 @@
-YBASE=/base
-[ -d "$YBASE" ] && cd $YBASE || { echo "invalid YBASE. Yenv not set. "; return 1; }
-[ -f "$YBASE/scripts/yenv" ] && source $YBASE/scripts/yenv
-export YBASE
+export YOS=`uname | awk '{print tolower($0)}'``uname -m`
+
+case $YOS in
+  linux*) YDIR=$HOME/ydir;;
+  darwin*) YDIR=$HOME/ydir;;
+  *) YDIR=/ydir;;
+esac
+
+[ -d "$YDIR" ] && cd $YDIR || { echo "invalid YDIR. Yenv not set. "; return 1; }
+[ -f "$YDIR/scripts/yenv" ] && source $YDIR/scripts/yenv
+export YDIR
+
