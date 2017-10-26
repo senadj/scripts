@@ -35,7 +35,6 @@ CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.pl
 ########################################## Windows
 *)
 
-
 if ! grep Q_MOC_RUN boost/type_traits/detail/has_binary_operator.hpp > /dev/null; then
 echo "#ifndef Q_MOC_RUN" > tmpf
 cat boost/type_traits/detail/has_binary_operator.hpp >> tmpf
