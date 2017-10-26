@@ -1,4 +1,4 @@
-gccbase=$YBASE/gcc
+gccbase=$YDIR/gcc
 ################## GNU C++ ##################
 
 if [ ! -f "$gccbase/bin/g++.exe" ]; then

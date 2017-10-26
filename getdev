@@ -1,7 +1,7 @@
-if [ -z ${YBASE+x} ]; then echo "YBASE var is unset. Aborting."; return 0
+if [ -z ${YDIR+x} ]; then echo "YDIR var is unset. Aborting."; return 0
 elif [ -z ${YDL+x} ]; then echo "YDL var is unset. Aborting."; return 0
-elif ! cd $YBASE; then echo "Can not switch to $YBASE directory - YBASE. Aborting."; return 0
-elif ! cd $YDL; then echo "Can not switch to $YDL directory - YDL. Aborting."; cd $YBASE; return 0
+elif ! cd $YDIR; then echo "Can not switch to $YDIR directory - YDIR. Aborting."; return 0
+elif ! cd $YDL; then echo "Can not switch to $YDL directory - YDL. Aborting."; cd $YDIR; return 0
 fi
 
 ################## download ##################

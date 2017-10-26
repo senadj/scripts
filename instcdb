@@ -1,4 +1,4 @@
-cdbbase=$YBASE/codeblocks
+cdbbase=$YDIR/codeblocks
 ################## CodeBlocks IDE ##################
 
 if [ ! -f "$cdbbase/codeblocks.exe" ]; then
@@ -6,8 +6,8 @@ if [ ! -f "$cdbbase/codeblocks.exe" ]; then
 mkdir -p $cdbbase/projects
 mkdir -p $cdbbase/AppData/codeblocks
 
-YTMP=`cygpath -m $YBASE | sed 's/\//\\\\\\\\/g'`
-cat $YBASE/scripts/default.conf | sed "s/YREPLACEBASE/$YTMP/g" > $cdbbase/AppData/codeblocks/default.conf
+YTMP=`cygpath -m $YDIR | sed 's/\//\\\\\\\\/g'`
+cat $YDIR/scripts/default.conf | sed "s/YREPLACEBASE/$YTMP/g" > $cdbbase/AppData/codeblocks/default.conf
 
 function xcdb () { 7za x -aoa $YDL/$1 -o$cdbbase; }
 xcdb CB_20151115_rev10574_win32.7z
