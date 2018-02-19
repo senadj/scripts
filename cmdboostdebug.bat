@@ -10,3 +10,4 @@ cd "%YBOO%/include" && ^
 move "INCLUDESUBDIR/boost" . && ^
 cd "%YBOO%/lib" && ^
 for /f "tokens=1,2,3,4,5 delims=-." %%i in ('dir /B "*.a"') DO @echo off && ren "%%i-%%j-%%k-%%l.%%m" "%%i.%%m" && @echo on && echo "Boost build done. Please close window or type exit."
+
