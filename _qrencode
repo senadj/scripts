@@ -17,7 +17,7 @@ esac
 else
 ############################ Build
 
-pnglib=`find $YPNG/lib/* -prune -name "*.a" ! -name "*.dll.a" | awk -Flib '{print $(NF)}' | cut -d'.' -f1 | sed 's/^/-l/'`
+pnglib=`find $YPNG/lib/* -prune -name "*.a" ! -name "*.dll.a" | awk -Flib '{print $(NF)}' | cut -d'.' -f1 | sed 's/^/-l/' | tr '\n' ' '`
 
 case $YOS in
 ########################################## Linux
