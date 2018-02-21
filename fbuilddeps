@@ -114,7 +114,7 @@ source $YDIR/scripts/_curl
 buildleveldb()
 {
 [ -f "$YSW/yconf" ] && source $YSW/yconf
-[ -d "$YLDB" ] || export YLDB=$YSW/leveldb-bitcoin-leveldb-1.17
+[ -d "$YLDB" ] || export YLDB=$YSW/leveldb-old-bitcoin-leveldb-1.17
 [ ! -z `source $YDIR/scripts/_leveldb check` ] && return 0
 [ -f "$YDL/bitcoin-leveldb-1.17.tar.gz" ] || ( cd $YDL && curl -LOk https://github.com/bitcoin-core/leveldb-old/archive/bitcoin-leveldb-1.17.tar.gz )
 [ -d "$YSTAGE/leveldb-old-bitcoin-leveldb-1.17" ] || tar -xvzf $YDL/bitcoin-leveldb-1.17.tar.gz -C $YSTAGE
