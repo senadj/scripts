@@ -5,8 +5,6 @@ if [ -z "$YOS" ]; then
 echo -e "\n\n\nYOS not set.\nAborting build\n\n\n"
 else
 
-[ -d "$YQR" ] || export YQR=$YSW/`pwd | xargs basename`
-
 if [ "$1" == "check" ]; then
 ############################ Check if exists
 case $YOS in
@@ -16,6 +14,7 @@ esac
 
 else
 ############################ Build
+[ -d "$YQR" ] || export YQR=$YSW/`pwd | xargs basename`
 
 pnglib=`find $YPNG/lib/* -prune -name "*.a" ! -name "*.dll.a" | awk -Flib '{print $(NF)}' | cut -d'.' -f1 | sed 's/^/-l/' | tr '\n' ' '`
 

@@ -5,14 +5,14 @@ if [ -z "$YOS" ]; then
 echo -e "\n\n\nYOS not set.\nAborting build\n\n\n"
 else
 
-[ -d "$YWX" ] || export YWX=$YSW/`pwd | xargs basename`
-
 if [ "$1" == "check" ]; then
 ############################ Check if exists
 [ -f "$YWX/bin/wx-config" ] && echo "found"
 
 else
 ############################ Build
+[ -d "$YWX" ] || export YWX=$YSW/`pwd | xargs basename`
+
 case $YOS in
 ########################################## Linux
 linux*)

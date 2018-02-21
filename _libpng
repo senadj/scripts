@@ -5,8 +5,6 @@ if [ -z "$YOS" ]; then
 echo -e "\n\n\nYOS not set.\nAborting build\n\n\n"
 else
 
-[ -d "$YPNG" ] || export YPNG=$YSW/`pwd | xargs basename`
-
 if [ "$1" == "check" ]; then
 ############################ Check if exists
 case $YOS in
@@ -16,6 +14,8 @@ esac
 
 else
 ############################ Build
+[ -d "$YPNG" ] || export YPNG=$YSW/`pwd | xargs basename`
+
 case $YOS in
 ########################################## Linux
 linux*)
