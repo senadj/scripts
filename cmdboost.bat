@@ -3,7 +3,7 @@ rem cmd started from MSYS has problems running subsequent commands after bootstr
 @echo on
 
 bootstrap mingw && ^
-b2 -a toolset=gcc cxxflags="-std=gnu++0x -Wno-deprecated-declarations -Wno-unused-variable -Wno-unknown-pragmas" ^
+b2 -a toolset=gcc cxxflags="-std=gnu++0x -save-temps -Wno-deprecated-declarations -Wno-unused-variable -Wno-unknown-pragmas" ^
 --with-chrono --with-filesystem --with-regex --with-program_options --with-system --with-thread --with-date_time ^
 --link=static --runtime-link=static linkflags="-static -static-libgcc -static-libstdc++ -s" threading=multi variant=release --prefix="%YBOO%" install && ^
 cd "%YBOO%/include" && ^
