@@ -20,7 +20,7 @@ case $YOS in
 ########################################## Linux
 linux*)
 
-./configure --enable-static --enable-shared --prefix=$YEVT
+./configure --disable-samples --enable-static --enable-shared --prefix=$YEVT
 make && make install
 
 ;;
@@ -28,14 +28,14 @@ make && make install
 darwin*)
 
 CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6" \
-./configure --disable-shared --enable-static --prefix=$YEVT
+./configure --disable-samples --disable-shared --enable-static --prefix=$YEVT
 make && make install
 
 ;;
 ########################################## Windows
 *)
 
-./configure LDFLAGS='-static -static-libgcc -s' --disable-shared --enable-static --prefix=$YEVT
+./configure LDFLAGS='-static -static-libgcc -s' --disable-samples --disable-shared --enable-static --prefix=$YEVT
 sed -i 's/\/usr\/bin\///' Makefile
 make && make install
 
