@@ -133,6 +133,28 @@ cd $YSTAGE/libevent-2.1.8-stable || { echo -e "\n\n\n\nLibEvent not build.\n\n\n
 source $YDIR/scripts/_libevent
 }
 ##########################################################################################
+buildzeromq
+{
+[ -f "$YSW/yconf" ] && source $YSW/yconf
+[ -d "$YZMQ" ] || export YZMQ=$YSW/zeromq-4.1.6
+[ ! -z `source $YDIR/scripts/_zeromq check` ] && return 0
+[ -f "$YDL/zeromq-4.1.6.tar.gz" ] || ( cd $YDL && curl -LOk https://github.com/zeromq/zeromq4-1/releases/download/v4.1.6/zeromq-4.1.6.tar.gz )
+[ -d "$YSTAGE/zeromq-4.1.6" ] || tar -xvzf $YDL/zeromq-4.1.6.tar.gz -C $YSTAGE
+cd $YSTAGE/zeromq-4.1.6 || { echo -e "\n\n\n\nZeroMQ not build.\n\n\n\n"; return 1; }
+source $YDIR/scripts/_zeromq
+}
+##########################################################################################
+buildprotobuf()
+{
+[ -f "$YSW/yconf" ] && source $YSW/yconf
+[ -d "$YPBUF" ] || export YPBUF=$YSW/protobuf-cpp-3.6.0
+[ ! -z `source $YDIR/scripts/_protobuf check` ] && return 0
+[ -f "$YDL/protobuf-cpp-3.6.0.tar.gz" ] || ( cd $YDL && curl -LOk https://github.com/google/protobuf/releases/download/v3.6.0/protobuf-cpp-3.6.0.tar.gz )
+[ -d "$YSTAGE/protobuf-3.6.0" ] || tar -xvzf $YDL/protobuf-cpp-3.6.0.tar.gz -C $YSTAGE
+cd $YSTAGE/protobuf-3.6.0 || { echo -e "\n\n\n\nProtoBuf not build.\n\n\n\n"; return 1; }
+source $YDIR/scripts/_protobuf
+}
+##########################################################################################
 buildqt()
 {
 [ -f "$YSW/yconf" ] && source $YSW/yconf
@@ -155,9 +177,5 @@ cd $YSTAGE/wxWidgets-3.1.0 || { echo -e "\n\n\n\nwxWidgets not build.\n\n\n\n"; 
 source $YDIR/scripts/_wxwidgets
 }
 
-export -f buildzlib buildopenssl buildberkeleydb buildboost buildminiupnpc buildlibevent buildlibpng buildqrencode buildpcre buildjansson buildcurl buildleveldb buildqt buildwxwidgets
-
-
-
-
-
+export -f buildzlib buildopenssl buildberkeleydb buildboost buildminiupnpc buildlibevent buildzeromq buildprotobuf \
+buildlibpng buildqrencode buildpcre buildjansson buildcurl buildleveldb buildqt buildwxwidgets

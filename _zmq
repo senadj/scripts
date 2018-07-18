@@ -1,0 +1,50 @@
+########################################################################################
+# ZeroMQ
+
+if [ -z "$YOS" ]; then
+echo -e "\n\n\nYOS not set.\nAborting build\n\n\n"
+else
+
+if [ "$1" == "check" ]; then
+############################ Check if exists
+case $YOS in
+  linux*) [ -d "$YZMQ/lib" ] && [ -f "`find $YZMQ/lib/* -prune -name "*.so" | head -1`" ] && echo "found";;
+  *) [ -d "$YZMQ/lib" ] && [ -f "`find $YZMQ/lib/* -prune -name "*.a" ! -name "*.dll.a" | head -1`" ] && echo "found";;
+esac
+
+else
+############################ Build
+[ -d "$YZMQ" ] || export YZMQ=$YSW/`pwd | xargs basename`
+
+case $YOS in
+########################################## Linux
+linux*)
+
+./configure --disable-debug --prefix=$YZMQ
+make && make install
+
+;;
+########################################## Mac OSX
+darwin*)
+
+CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6" \
+./configure --disable-shared --enable-static --disable-debug --prefix=$YZMQ
+make && make install
+
+;;
+########################################## Windows
+*)
+
+mv ./tweetnacl/contrib/randombytes/winrandom.c ./tweetnacl/contrib/randombytes/devurandom.c
+sed -i '17853s/.*.*/CPPFLAGS=-DZMQ_STATIC/' configure
+./configure "CXXFLAGS=-std=gnu++0x" LDFLAGS='-static -static-libgcc -s' --disable-debug --disable-shared --enable-static --prefix=$YZMQ
+find . -name Makefile | xargs sed -i 's/\/usr\/bin\///'
+make && make install
+
+;;
+
+esac
+
+if ! grep YZMQ $YSW/yconf > /dev/null; then echo "YZMQ=$YZMQ" >> $YSW/yconf; fi
+fi
+fi

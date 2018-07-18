@@ -1,0 +1,49 @@
+########################################################################################
+# protobuf
+
+if [ -z "$YOS" ]; then
+echo -e "\n\n\nYOS not set.\nAborting build\n\n\n"
+else
+
+if [ "$1" == "check" ]; then
+############################ Check if exists
+case $YOS in
+  linux*) [ -d "$YPBUF/lib" ] && [ -f "`find $YPBUF/lib/* -prune -name "*.so" | head -1`" ] && echo "found";;
+  *) [ -d "$YPBUF/lib" ] && [ -f "`find $YPBUF/lib/* -prune -name "*.a" ! -name "*.dll.a" | head -1`" ] && echo "found";;
+esac
+
+else
+############################ Build
+[ -d "$YPBUF" ] || export YPBUF=$YSW/`pwd | xargs basename`
+
+case $YOS in
+########################################## Linux
+linux*)
+
+./configure --enable-static --enable-shared --with-zlib-include=$YZLIB/include --with-zlib-lib=$YZLIB/lib --prefix=$YPBUF
+make && make install
+
+;;
+########################################## Mac OSX
+darwin*)
+
+CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6" \
+./configure --disable-shared --enable-static --disable-debug --with-zlib-include=$YZLIB/include --with-zlib-lib=$YZLIB/lib --prefix=$YPBUF
+make && make install
+
+;;
+########################################## Windows
+*)
+
+./configure LDFLAGS='-static -static-libgcc -s' --disable-shared --enable-static --disable-debug --with-zlib-include=$YZLIB/include --with-zlib-lib=$YZLIB/lib --prefix=$YPBUF
+find . -name Makefile | xargs sed -i 's/\/usr\/bin\///'
+find . -name Makefile | xargs sed -i 's/c++11/gnu++0x -Wno-deprecated-declarations/'
+make && make install
+
+;;
+
+esac
+
+if ! grep YPBUF $YSW/yconf > /dev/null; then echo "YPBUF=$YPBUF" >> $YSW/yconf; fi
+fi
+fi
