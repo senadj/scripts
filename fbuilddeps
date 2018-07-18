@@ -133,7 +133,7 @@ cd $YSTAGE/libevent-2.1.8-stable || { echo -e "\n\n\n\nLibEvent not build.\n\n\n
 source $YDIR/scripts/_libevent
 }
 ##########################################################################################
-buildzeromq
+buildzeromq()
 {
 [ -f "$YSW/yconf" ] && source $YSW/yconf
 [ -d "$YZMQ" ] || export YZMQ=$YSW/zeromq-4.1.6
