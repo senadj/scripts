@@ -48,11 +48,11 @@ source $YDIR/scripts/_boost
 buildminiupnpc()
 {
 [ -f "$YSW/yconf" ] && source $YSW/yconf
-[ -d "$YUPNP" ] || export YUPNP=$YSW/miniupnpc-1.9.20150206
+[ -d "$YUPNP" ] || export YUPNP=$YSW/miniupnpc-1.9.20160209
 [ ! -z `source $YDIR/scripts/_miniupnpc check` ] && return 0
-[ -f "$YDL/miniupnpc-1.9.20150206.tar.gz" ] || ( cd $YDL && curl -Lk http://miniupnp.free.fr/files/download.php?file=miniupnpc-1.9.20150206.tar.gz > miniupnpc-1.9.20150206.tar.gz )
-[ -d "$YSTAGE/miniupnpc-1.9.20150206" ] || tar -zxvf $YDL/miniupnpc-1.9.20150206.tar.gz -C $YSTAGE
-cd $YSTAGE/miniupnpc-1.9.20150206 || { echo -e "\n\n\n\nminiUPnP not build.\n\n\n\n"; return 1; }
+[ -f "$YDL/miniupnpc-1.9.20160209.tar.gz" ] || ( cd $YDL && curl -Lk http://miniupnp.free.fr/files/download.php?file=miniupnpc-1.9.20160209.tar.gz > miniupnpc-1.9.20160209.tar.gz )
+[ -d "$YSTAGE/miniupnpc-1.9.20160209" ] || tar -zxvf $YDL/miniupnpc-1.9.20160209.tar.gz -C $YSTAGE
+cd $YSTAGE/miniupnpc-1.9.20160209 || { echo -e "\n\n\n\nminiUPnP not build.\n\n\n\n"; return 1; }
 source $YDIR/scripts/_miniupnpc
 }
 ##########################################################################################
