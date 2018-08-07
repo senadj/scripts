@@ -27,7 +27,7 @@ make && make install
 ########################################## Mac OSX
 darwin*)
 
-CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6" \
+CXX="g++-4.8" CPPFLAGS="-DEOWNERDEAD=105 -DENOTRECOVERABLE=104 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6" \
 ./configure --disable-shared --enable-static --disable-debug --with-zlib-include=$YZLIB/include --with-zlib-lib=$YZLIB/lib --prefix=$YPBUF
 make && make install
 
@@ -45,5 +45,6 @@ make && make install
 esac
 
 if ! grep YPBUF $YSW/yconf > /dev/null; then echo "YPBUF=$YPBUF" >> $YSW/yconf; fi
+if [ `echo $PATH | grep protobuf | wc -l` -eq 0 ]; then export PATH=$PATH:$YPBUF/bin; fi
 fi
 fi

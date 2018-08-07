@@ -27,7 +27,7 @@ make && make install
 ########################################## Mac OSX
 darwin*)
 
-CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6" \
+CPPFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6" \
 ./configure --disable-shared --enable-static --disable-debug --prefix=$YZMQ
 make && make install
 
