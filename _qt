@@ -8,7 +8,7 @@ else
 if [ "$1" == "check" ]; then
 ############################ Check if exists
 case $YOS in
-  linux*) [ -d "$YQT/lib" ] && [ `find $YQT/lib/* -prune -name "*.so" | wc -l` -gt 11 ] && echo "found";;
+  linux*) [ -d "$YQT/lib" ] && [ `find $YQT/lib/* -prune -name "*.so" | wc -l` -gt 10 ] && echo "found";;
   *) [ -d "$YQT/lib" ] && [ `find $YQT/lib/* -prune -name "*.a" ! -name "*.dll.a" | wc -l` -gt 11 ] && echo "found";;
 esac
 
@@ -22,6 +22,11 @@ linux*)
 
 case $YOS in *64*) YTMP="-64";; *) YTMP=;; esac
 if ! grep QMAKE_CXXFLAGS mkspecs/linux-g++$YTMP/qmake.conf > /dev/null; then sed -i '1 i\QMAKE_CXXFLAGS *= -std=gnu++0x' mkspecs/linux-g++$YTMP/qmake.conf; fi
+
+YTMP='    view()->selectionModel()->select(index, static_cast<QItemSelectionModel::SelectionFlags>(QItemSelectionModel::Columns \& QItemSelectionModel::Deselect));'
+sed -i "396s/.*/$YTMP/" src/plugins/accessible/widgets/itemviews.cpp
+sed -i '820s/.*/        return nullptr;/' tools/designer/src/lib/shared/previewmanager.cpp
+
 ./configure -prefix $YQT -I $YOSSL/include -openssl -platform linux-g++$YTMP -release -shared -opensource -confirm-license -no-sql-sqlite -no-qt3support -no-opengl -qt-zlib -no-gif -qt-libpng -qt-libmng -no-libtiff -qt-libjpeg -no-dbus -no-phonon -no-phonon-backend -no-multimedia -no-audio-backend -no-webkit -no-script -no-scripttools -no-declarative -no-declarative-debug -nomake demos -nomake examples
 make && make install
 
