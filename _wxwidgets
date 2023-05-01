@@ -11,14 +11,14 @@ if [ "$1" == "check" ]; then
 
 else
 ############################ Build
-[ -d "$YWX" ] || export YWX=$YSW/`pwd | xargs basename`
+[ -d "$YWX" ] || export YWX=$YSW/wx`pwd | xargs basename | cut -d'-' -f2 | sed "s/\.//g" | sed 's/.//4g'`
 
 case $YOS in
 ########################################## Linux
 linux*)
 
 mkdir -p stage && cd stage
-../configure CXXFLAGS="-std=gnu++0x -Wno-unused-variable -Wno-deprecated-declarations" --disable-debug_flag --prefix=$YWX
+../configure CXXFLAGS="-std=gnu++0x -Wno-unused-variable -Wno-deprecated-declarations" --disable-debug_flag --disable-dependency-tracking --prefix=$YWX
 make && make install
 
 ;;
